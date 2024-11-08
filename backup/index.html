@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow Management System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+<div class="min-h-screen">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-xl font-bold">Workflow Manager</h1>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <span id="userInfo" class="text-gray-700"></span>
+                    <button onclick="logout()" class="ml-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Flow Management -->
+        <div class="bg-white shadow rounded-lg p-6 mb-6">
+            <h2 class="text-lg font-medium mb-4">Create New Flow</h2>
+            <form id="flowForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Flow Name</label>
+                    <input type="text" id="flowName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <div id="stepsContainer" class="space-y-4">
+                    <!-- Steps will be added here dynamically -->
+                </div>
+
+                <div class="flex justify-between">
+                    <button type="button" onclick="addStep()" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Add Step</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Create Flow</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Process Management (Admin Only) -->
+        <div id="adminSection" class="bg-white shadow rounded-lg p-6 mb-6 hidden">
+            <h2 class="text-lg font-medium mb-4">Create New Process</h2>
+            <form id="processForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Process Name</label>
+                    <input type="text" id="processName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Command</label>
+                    <input type="text" id="processCommand" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Filters (comma-separated)</label>
+                    <input type="text" id="processFilters" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Create Process</button>
+            </form>
+        </div>
+
+        <!-- Flow List -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-lg font-medium mb-4">Your Flows</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="flowList" class="bg-white divide-y divide-gray-200">
+                    <!-- Flows will be listed here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // Protocol definitions
+    const PROTOCOLS = {
+        rtsp: {
+            name: 'RTSP Stream',
+            params: ['url', 'timeout', 'quality']
+        },
+        file: {
+            name: 'File System',
+            params: ['path', 'format']
+        },
+        schedule: {
+            name: 'Schedule',
+            params: ['cron', 'timezone']
+        },
+        email: {
+            name: 'Email',
+            params: ['address', 'subject', 'template']
+        },
+        process: {
+            name: 'Process',
+            params: ['name', 'args']
+        },
+        publish: {
+            name: 'Publish Event',
+            params: ['topic', 'data']
+        },
+        subscribe: {
+            name: 'Subscribe Event',
+            params: ['topic', 'filter']
+        }
+    };
+
+    let currentUser = null;
+
+    // Authentication
+    async function checkAuth() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/user', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            currentUser = await response.json();
+
+            document.getElementById('userInfo').textContent = currentUser.username;
+            if (currentUser.is_admin) {
+                document.getElementById('adminSection').classList.remove('hidden');
+            }
+        } catch (error) {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+    }
+
+    // Flow Management
+    function addStep() {
+        const stepsContainer = document.getElementById('stepsContainer');
+        const stepIndex = stepsContainer.children.length;
+
+        const stepDiv = document.createElement('div');
+        stepDiv.className = 'flex space-x-4 items-start border p-4 rounded';
+        stepDiv.innerHTML = `
+        <div class="flex-1 space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Protocol</label>
+                <select onchange="updateProtocolParams(${stepIndex})" class="protocol-select mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    ${Object.entries(PROTOCOLS).map(([key, value]) =>
+            `<option value="${key}">${value.name}</option>`
+        ).join('')}
+                </select>
+            </div>
+
+            <div class="path-input">
+                <label class="block text-sm font-medium text-gray-700">Path/URL</label>
+                <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>
+
+            <div class="params-container space-y-2">
+                <!-- Parameters will be added dynamically -->
+            </div>
+        </div>
+
+        <button onclick="removeStep(${stepIndex})" class="text-red-500 hover:text-red-700">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+        </button>
+    `;
+
+        stepsContainer.appendChild(stepDiv);
+        updateProtocolParams(stepIndex);
+    }
+
+    function updateProtocolParams(stepIndex) {
+        const stepDiv = document.getElementById('stepsContainer').children[stepIndex];
+        const protocol = stepDiv.querySelector('.protocol-select').value;
+        const paramsContainer = stepDiv.querySelector('.params-container');
+
+        paramsContainer.innerHTML = PROTOCOLS[protocol].params.map(param => `
+        <div>
+            <label class="block text-sm font-medium text-gray-700">${param}</label>
+            <input type="text" name="${param}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+        </div>
+    `).join('');
+    }
+
+    function removeStep(index) {
+        document.getElementById('stepsContainer').children[index].remove();
+    }
+
+    async function createFlow(event) {
+        event.preventDefault();
+
+        const steps = Array.from(document.getElementById('stepsContainer').children).map(stepDiv => {
+            const protocol = stepDiv.querySelector('.protocol-select').value;
+            const path = stepDiv.querySelector('.path-input input').value;
+            const params = {};
+
+            stepDiv.querySelectorAll('.params-container input').forEach(input => {
+                params[input.name] = input.value;
+            });
+
+            return { protocol, path, params };
+        });
+
+        try {
+            const response = await fetch('/api/flows', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    name: document.getElementById('flowName').value,
+                    steps
+                })
+            });
+
+            if (response.ok) {
+                await loadFlows();
+                document.getElementById('flowForm').reset();
+                document.getElementById('stepsContainer').innerHTML = '';
+            } else {
+                alert('Failed to create flow');
+            }
+        } catch (error) {
+            console.error('Error creating flow:', error);
+            alert('Error creating flow');
+        }
+    }
+
+    async function loadFlows() {
+        try {
+            const response = await fetch('/api/flows', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            const flows = await response.json();
+            const flowList = document.getElementById('flowList');
+
+            flowList.innerHTML = flows.map(flow => `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">${flow.name}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                flow.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            }">
+                        ${flow.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">${new Date(flow.created_at).toLocaleString()}</td>
+                <td class="px-6 py-4 whitespace-nowrap space-x-2">
+                    <button onclick="executeFlow(${flow.id})" class="text-blue-600 hover:text-blue-900">Execute</button>
+                    <button onclick="editFlow(${flow.id})" class="text-green-600 hover:text-green-900">Edit</button>
+                    <button onclick="deleteFlow(${flow.id})" class="text-red-600 hover:text-red-900">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+        } catch (error) {
+            console.error('Error loading flows:', error);
+        }
+    }
+
+    async function executeFlow(flowId) {
+        try {
+            const response = await fetch(`/api/flows/${flowId}/execute`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (response.ok) {
+                alert('Flow execution started');
+            } else {
+                alert('Failed to execute flow');
+            }
+        } catch (error) {
+            console.error('Error executing flow:', error);
+            alert('Error executing flow');
+        }
+    }
+
+    // Process Management (Admin only)
+    async function createProcess(event) {
+        event.preventDefault();
+
+        if (!currentUser.is_admin) {
+            alert('Admin access required');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/processes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    name: document.getElementById('processName').value,
+                    command: document.getElementById('processCommand').value,
+                    filters: document.getElementById('processFilters').value.split(',').map(f => f.trim())
+                })
+            });
+
+            if (response.ok) {
+                document.getElementById('processForm').reset();
+                alert('Process created successfully');
+            } else {
+                alert('Failed to create process');
+            }
+        } catch (error) {
+            console.error('Error creating process:', error);
+            alert('Error creating process');
+        }
+    }
+
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+        checkAuth();
+        loadFlows();
+
+        document.getElementById('flowForm').addEventListener('submit', createFlow);
+        document.getElementById('processForm')?.addEventListener('submit', createProcess);
+    });
+    </script>
+</body>
+</html>
