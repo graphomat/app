@@ -21,12 +21,16 @@ import smtplib
 import time
 import re
 from urllib.parse import urlparse
+from .api import router as api_router
 
 # Load environment variables
 load_dotenv()
 
-app = FastAPI()
+app = FastAPI(title="Graphomat API")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+# Include API router
+app.include_router(api_router, prefix="/api")
 
 # Models
 class Step(BaseModel):
@@ -274,8 +278,8 @@ scheduler_thread.start()
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        "main:app",
-        host=os.getenv('SERVER_HOST'),
-        port=int(os.getenv('SERVER_PORT')),
-        reload=bool(os.getenv('DEBUG'))
+        "app.main:app",
+        host=os.getenv('SERVER_HOST', "0.0.0.0"),
+        port=int(os.getenv('SERVER_PORT', 8080)),
+        reload=bool(os.getenv('DEBUG', True))
     )

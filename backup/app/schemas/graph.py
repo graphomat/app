@@ -1,31 +1,32 @@
-
-# File: app/schemas/graph.py
 from pydantic import BaseModel
-from typing import List, Dict, Any, Optional
-from datetime import datetime
-from .common import GraphStatus
+from typing import Optional, List, Dict
+from enum import Enum
 
-class NodeBase(BaseModel):
-    type: str
-    position: Dict[str, float]
-    data: Dict[str, Any]
+class GraphStatus(str, Enum):
+    DRAFT = "draft"
+    ACTIVE = "active"
+    ARCHIVED = "archived"
 
-class EdgeBase(BaseModel):
-    source: str
-    target: str
-    type: str
+class GraphBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+    status: GraphStatus = GraphStatus.DRAFT
+    config: Optional[Dict] = {}
 
-class GraphCreate(BaseModel):
-    name: str
-    nodes: List[NodeBase]
-    edges: List[EdgeBase]
+class GraphCreate(GraphBase):
+    pass
 
-class Graph(GraphCreate):
+class GraphUpdate(GraphBase):
+    title: Optional[str] = None
+    status: Optional[GraphStatus] = None
+
+class Graph(GraphBase):
     id: int
-    status: GraphStatus
-    created_at: datetime
-    updated_at: datetime
-    owner_id: int
+    user_id: int
 
     class Config:
         from_attributes = True
+
+class GraphWithDetails(Graph):
+    deployments_count: int = 0
+    latest_deployment: Optional[Dict] = None
