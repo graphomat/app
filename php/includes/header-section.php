@@ -1,8 +1,3 @@
-<?php
-// header.php
-session_start();
-?>
-
 <style>
     :root {
         --primary-color: #0a1657;
@@ -112,16 +107,20 @@ session_start();
     }
 </style>
 
-<header class="header">
-    <nav class="nav-container">
-        <div class="logo">
-            <!-- Logo can be managed from backend -->
-            <img src="logo.svg" alt="Logo" height="40">
+
+<main>
+    <section class="hero-section">
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>Комплексная<br>ДБТ терапия</h1>
+                <p>"Создание жизни, достойной того чтобы жить"</p>
+                <button class="cta-button">ЗАПИСАТЬСЯ НА ПРИЕМ СПЕЦИАЛИСТА</button>
+            </div>
+        </section>
+        <div class="hero-image">
+            <!-- SVG icon can be managed from backend -->
+            <img src="logo.png"/>
+
         </div>
-        <ul class="nav-menu">
-            <?php foreach ($navigation as $key => $item): ?>
-                <li><a href="<?php echo $key; ?>.php"><?php echo htmlspecialchars($item); ?></a></li>
-            <?php endforeach; ?>
-        </ul>
-    </nav>
-</header>
+    </section>
+</main>

@@ -1,7 +1,30 @@
 <?php
 // header.php
 session_start();
+
+// Navigation items array - can be managed from backend
+$navigation = [
+    'about' => 'O NAS',
+    'training' => 'TRENING',
+    'specialists' => 'SPECJALIŚCI',
+    'services' => 'USŁUGI',
+    'contact' => 'KONTAKT'
+];
 ?>
+
+
+<?php
+/*
+// Navigation items array - can be managed from backend
+$navigation = [
+    'about' => 'O NAS',
+    'training' => 'TRENING',
+    'specialists' => 'SPECJALIŚCI',
+    'services' => 'USŁUGI',
+    'contact' => 'KONTAKT'
+];*/
+?>
+
 
 <style>
     :root {
