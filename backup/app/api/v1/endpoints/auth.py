@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from typing import Any
-from ....core import security
+from ....core.security import create_access_token, get_current_user
 from ....core.config import settings
 from ....schemas.user import User, UserCreate, Token
 from ....services.user import UserService
@@ -28,7 +28,7 @@ async def login(
         )
     
     return {
-        "access_token": security.create_access_token(user.id),
+        "access_token": create_access_token(user.id),
         "token_type": "bearer",
     }
 
@@ -50,3 +50,12 @@ async def register(
     
     user = await UserService.create(db, obj_in=user_in)
     return user
+
+@router.get("/me", response_model=User)
+async def read_users_me(
+    current_user: User = Depends(get_current_user),
+) -> Any:
+    """
+    Get current user.
+    """
+    return current_user

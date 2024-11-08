@@ -2,11 +2,12 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 
 class UserBase(BaseModel):
-    email: EmailStr
-    is_active: bool = True
+    email: Optional[EmailStr] = None
+    is_active: Optional[bool] = True
     is_admin: bool = False
 
 class UserCreate(UserBase):
+    email: EmailStr
     password: str
 
 class UserUpdate(UserBase):
@@ -14,6 +15,7 @@ class UserUpdate(UserBase):
 
 class User(UserBase):
     id: int
+    email: EmailStr
 
     class Config:
         from_attributes = True
@@ -21,6 +23,3 @@ class User(UserBase):
 class Token(BaseModel):
     access_token: str
     token_type: str
-
-class TokenPayload(BaseModel):
-    sub: Optional[int] = None

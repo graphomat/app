@@ -1,35 +1,29 @@
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List, Optional
-from ....core.security import get_current_user
-from ....schemas.graph import (
-    Graph, 
-    GraphCreate, 
-    GraphUpdate, 
-    GraphStatus,
-    GraphWithDetails
-)
+from typing import Any, List, Optional
+from ....core import security
+from ....schemas.graph import Graph, GraphCreate, GraphUpdate
 from ....services.graph import GraphService
+from ....models.user import User
 from ....db.session import get_db
 
 router = APIRouter()
 
 @router.get("/", response_model=List[Graph])
 async def list_graphs(
-    *,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user),
     skip: int = 0,
     limit: int = 100,
-    status: Optional[GraphStatus] = None
-) -> List[Graph]:
+    status: Optional[str] = None,
+    current_user: User = Depends(security.get_current_user)
+) -> Any:
     """
     Retrieve graphs.
     """
     graphs = await GraphService.get_multi(
-        db, 
+        db,
         user_id=current_user.id,
-        skip=skip, 
+        skip=skip,
         limit=limit,
         status=status
     )
@@ -40,8 +34,8 @@ async def create_graph(
     *,
     db: Session = Depends(get_db),
     graph_in: GraphCreate,
-    current_user = Depends(get_current_user)
-) -> Graph:
+    current_user: User = Depends(security.get_current_user)
+) -> Any:
     """
     Create new graph.
     """
@@ -52,13 +46,13 @@ async def create_graph(
     )
     return graph
 
-@router.get("/{graph_id}", response_model=GraphWithDetails)
+@router.get("/{graph_id}", response_model=Graph)
 async def get_graph(
     *,
     db: Session = Depends(get_db),
     graph_id: int,
-    current_user = Depends(get_current_user)
-) -> GraphWithDetails:
+    current_user: User = Depends(security.get_current_user)
+) -> Any:
     """
     Get graph by ID.
     """
@@ -75,8 +69,8 @@ async def update_graph(
     db: Session = Depends(get_db),
     graph_id: int,
     graph_in: GraphUpdate,
-    current_user = Depends(get_current_user)
-) -> Graph:
+    current_user: User = Depends(security.get_current_user)
+) -> Any:
     """
     Update graph.
     """
@@ -94,8 +88,8 @@ async def delete_graph(
     *,
     db: Session = Depends(get_db),
     graph_id: int,
-    current_user = Depends(get_current_user)
-) -> dict:
+    current_user: User = Depends(security.get_current_user)
+) -> Any:
     """
     Delete graph.
     """

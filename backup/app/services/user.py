@@ -1,23 +1,29 @@
 from sqlalchemy.orm import Session
 from typing import Optional
-from ..core.security import get_password_hash, verify_password
-from ..schemas.user import UserCreate, User
+from ..core.hashing import get_password_hash, verify_password
+from ..schemas.user import UserCreate
+from ..models.user import User
 
 class UserService:
     @staticmethod
+    async def get(db: Session, id: int) -> Optional[User]:
+        return db.query(User).filter(User.id == id).first()
+
+    @staticmethod
     async def get_by_email(db: Session, *, email: str) -> Optional[User]:
-        # TODO: Implement actual database query
-        return None
+        return db.query(User).filter(User.email == email).first()
 
     @staticmethod
     async def create(db: Session, *, obj_in: UserCreate) -> User:
-        # TODO: Implement actual database creation
         db_obj = User(
             email=obj_in.email,
             hashed_password=get_password_hash(obj_in.password),
             is_active=True,
             is_admin=False
         )
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
         return db_obj
 
     @staticmethod
