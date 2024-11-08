@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, Dict
 from enum import Enum
 
@@ -8,17 +8,19 @@ class GraphStatus(str, Enum):
     ARCHIVED = "archived"
 
 class GraphBase(BaseModel):
-    title: str
-    description: Optional[str] = None
-    status: GraphStatus = GraphStatus.DRAFT
-    config: Optional[Dict] = {}
+    title: str = Field(..., description="The title of the graph")
+    description: Optional[str] = Field(None, description="Optional description of the graph")
+    status: GraphStatus = Field(default=GraphStatus.DRAFT, description="Current status of the graph")
+    config: Optional[Dict] = Field(default={}, description="Optional configuration for the graph")
 
 class GraphCreate(GraphBase):
     pass
 
-class GraphUpdate(GraphBase):
+class GraphUpdate(BaseModel):
     title: Optional[str] = None
+    description: Optional[str] = None
     status: Optional[GraphStatus] = None
+    config: Optional[Dict] = None
 
 class Graph(GraphBase):
     id: int
@@ -26,7 +28,13 @@ class Graph(GraphBase):
 
     class Config:
         from_attributes = True
-
-class GraphWithDetails(Graph):
-    deployments_count: int = 0
-    latest_deployment: Optional[Dict] = None
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "title": "My Graph",
+                "description": "A sample graph",
+                "status": "draft",
+                "config": {},
+                "user_id": 1
+            }
+        }

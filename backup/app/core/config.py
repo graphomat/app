@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+import os
 
 class Settings(BaseModel):
     PROJECT_NAME: str = "Graphomat"
@@ -16,7 +17,7 @@ class Settings(BaseModel):
     DEBUG: bool = True
     
     # Database
-    DB_PATH: str = "app.db"
+    DB_PATH: str = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "app.db")
     
     # Email
     EMAIL_FROM: Optional[str] = None

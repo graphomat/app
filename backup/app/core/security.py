@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from .config import settings
 from ..db.session import get_db
-from ..services.user import UserService
+from ..models.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
 
@@ -31,7 +31,7 @@ def create_access_token(
 async def get_current_user(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme)
-):
+) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -49,6 +49,7 @@ async def get_current_user(
     except jwt.JWTError:
         raise credentials_exception
     
+    from ..services.user import UserService  # Import here to avoid circular import
     user = await UserService.get(db, id=int(user_id))
     if user is None:
         raise credentials_exception

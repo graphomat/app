@@ -1,5 +1,7 @@
 from fastapi import APIRouter
-from .endpoints import auth, graphs, deployments
+from .endpoints.auth import router as auth
+from .endpoints.graphs import router as graphs
+from .endpoints.deployments import router as deployments
 
 api_router = APIRouter()
 api_router.include_router(auth, prefix="/auth", tags=["auth"])

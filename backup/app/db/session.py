@@ -1,6 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from ..core.config import settings
+from .base import Base
+from ..models import user, graph  # Import models to register them with Base
 
 # Create SQLAlchemy engine
 engine = create_engine(

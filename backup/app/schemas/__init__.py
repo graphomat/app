@@ -1,25 +1,13 @@
-from .user import User, UserCreate, Token
-from .graph import Graph, GraphCreate, GraphUpdate, GraphStatus, GraphWithDetails
-from .deployment import (
-    Deployment,
-    DeploymentCreate,
-    DeploymentStatus,
-    DeploymentWithLogs,
-    DeploymentLog
-)
+from .user import User, UserCreate, UserUpdate, Token
+from .graph import Graph, GraphCreate, GraphUpdate, GraphStatus
 
 __all__ = [
     "User",
     "UserCreate",
+    "UserUpdate",
     "Token",
     "Graph",
     "GraphCreate",
     "GraphUpdate",
-    "GraphStatus",
-    "GraphWithDetails",
-    "Deployment",
-    "DeploymentCreate",
-    "DeploymentStatus",
-    "DeploymentWithLogs",
-    "DeploymentLog"
+    "GraphStatus"
 ]

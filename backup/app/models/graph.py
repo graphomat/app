@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, JSON, Enum as SQLAlchemyEnum
 from sqlalchemy.orm import relationship
 from enum import Enum as PyEnum
-from .user import Base
+from ..db.base import Base
 
 class GraphStatus(str, PyEnum):
     DRAFT = "draft"

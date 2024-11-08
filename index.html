@@ -69,7 +69,6 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deployments</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                     </thead>
@@ -101,7 +100,9 @@
             });
             currentUser = await response.json();
             document.getElementById('userInfo').textContent = currentUser.email;
+            await loadGraphs();
         } catch (error) {
+            console.error('Auth error:', error);
             localStorage.removeItem('token');
             window.location.href = '/login.html';
         }
@@ -117,11 +118,19 @@
         event.preventDefault();
 
         try {
+            let config = {};
+            try {
+                config = JSON.parse(document.getElementById('graphConfig').value);
+            } catch (e) {
+                alert('Invalid JSON in config field');
+                return;
+            }
+
             const graphData = {
                 title: document.getElementById('graphTitle').value,
-                description: document.getElementById('graphDescription').value,
+                description: document.getElementById('graphDescription').value || null,
                 status: document.getElementById('graphStatus').value,
-                config: JSON.parse(document.getElementById('graphConfig').value)
+                config: config
             };
 
             const response = await fetch('/api/v1/graphs', {
@@ -154,6 +163,10 @@
                 }
             });
 
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const graphs = await response.json();
             const graphList = document.getElementById('graphList');
 
@@ -169,7 +182,6 @@
                             ${graph.status}
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">${graph.deployments_count || 0}</td>
                     <td class="px-6 py-4 whitespace-nowrap space-x-2">
                         <button onclick="editGraph(${graph.id})" class="text-blue-600 hover:text-blue-900">Edit</button>
                         <button onclick="deleteGraph(${graph.id})" class="text-red-600 hover:text-red-900">Delete</button>
@@ -208,7 +220,6 @@
     // Event Listeners
     document.addEventListener('DOMContentLoaded', () => {
         checkAuth();
-        loadGraphs();
         document.getElementById('graphForm').addEventListener('submit', createGraph);
     });
 </script>

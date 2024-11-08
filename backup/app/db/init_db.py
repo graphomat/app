@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from ..core.config import settings
-from ..models.user import Base as UserBase
-from ..models.graph import Base as GraphBase
+from .base import Base
+from ..models import user, graph  # Import models to register them with Base
 
 def init_db():
     # Create SQLAlchemy engine
@@ -12,8 +12,7 @@ def init_db():
     )
 
     # Create all tables
-    UserBase.metadata.create_all(bind=engine)
-    GraphBase.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
 
     # Create SessionLocal class
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
