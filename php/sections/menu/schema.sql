@@ -1,6 +1,6 @@
 -- Menu section configuration
-INSERT INTO sections (name, title, description, sort_order) VALUES
-('menu', 'Menu Section', 'Main navigation menu', 1);
+INSERT OR REPLACE INTO sections (name, title, description, type, sort_order) VALUES
+('menu', 'Menu Section', 'Main navigation menu', 'menu', 1);
 
 -- Menu items table schema
 CREATE TABLE menu_items (

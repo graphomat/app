@@ -1,6 +1,6 @@
 -- Footer section configuration
-INSERT INTO sections (name, title, description, sort_order) VALUES
-('footer', 'Footer Section', 'Site footer with links and social media', 99);
+INSERT OR REPLACE INTO sections (name, title, description, type, sort_order) VALUES
+('footer', 'Footer Section', 'Site footer with links and social media', 'footer', 99);
 
 -- Footer links table schema
 CREATE TABLE footer_links (

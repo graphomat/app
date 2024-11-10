@@ -33,6 +33,7 @@ $page = $_GET['page'] ?? 'dashboard';
                 <li><a href="?page=menu" <?php echo $page === 'menu' ? 'class="active"' : ''; ?>>Menu</a></li>
                 <li><a href="?page=components" <?php echo $page === 'components' ? 'class="active"' : ''; ?>>Components</a></li>
                 <li><a href="?page=seo" <?php echo $page === 'seo' ? 'class="active"' : ''; ?>>SEO</a></li>
+                <li><a href="?page=diagnostics" <?php echo $page === 'diagnostics' ? 'class="active"' : ''; ?>>Diagnostics</a></li>
                 <li><a href="?page=config" <?php echo $page === 'config' ? 'class="active"' : ''; ?>>Configuration</a></li>
                 <li><a href="?page=media" <?php echo $page === 'media' ? 'class="active"' : ''; ?>>Media</a></li>
                 <li><a href="logout.php">Logout</a></li>

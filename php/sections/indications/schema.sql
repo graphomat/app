@@ -1,6 +1,6 @@
 -- Indications section configuration
-INSERT INTO sections (name, title, description, sort_order) VALUES
-('indications', 'Indications Section', 'DBT therapy indications', 4);
+INSERT OR REPLACE INTO sections (name, title, description, type, sort_order) VALUES
+('indications', 'Indications Section', 'DBT therapy indications', 'indications', 4);
 
 -- DBT indications table schema
 CREATE TABLE dbt_indications (

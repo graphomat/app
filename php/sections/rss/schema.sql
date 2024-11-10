@@ -1,6 +1,6 @@
 -- RSS section configuration
-INSERT INTO sections (name, title, description, sort_order) VALUES
-('rss', 'RSS Feed Section', 'RSS feed generation', 99);
+INSERT OR REPLACE INTO sections (name, title, description, type, sort_order) VALUES
+('rss', 'RSS Feed Section', 'RSS feed generation', 'rss', 99);
 
 -- RSS settings table schema
 CREATE TABLE rss_settings (

@@ -1,6 +1,6 @@
 -- Program section configuration
-INSERT INTO sections (name, title, description, sort_order) VALUES
-('program', 'Program Section', 'DBT program components', 5);
+INSERT OR REPLACE INTO sections (name, title, description, type, sort_order) VALUES
+('program', 'Program Section', 'DBT program components', 'program', 5);
 
 -- Program components table schema
 CREATE TABLE program_components (

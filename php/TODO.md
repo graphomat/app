@@ -38,6 +38,14 @@ panel administracyjny admin/index.php powinien mieć menu do wyboru component.ph
 
 
 
+
+Stworz diagnostyke do testowania czy w plikach componentow, sections są błędy, uruchom je i sprawdz i pokaz błędy w panelu administracyjnym oraz w pliku test.php i test.sh w folderze glownym z opcjonalnym parametrem dotyczacym co ma byc testowane
+Dodaj opcję w test.sh do sprawdzania czy sa duplikaty tworzonych tabel i kolumn w scehma.sql głównym i w modułach, komponentach, usuń duplikaty w ./schema.sql  
+
+Dopasuj wyglad panelu administracyjnego aby byl bardziej mobilny i latwiejszy w uzyciu z mozliwoscia tesowania live w okienku obok 
+
+
+
 Stworz folder na kompletne aplikacje/strony niezalezne moduły typu: blog, RSS, SITEMAP, które korzystaja z danych strony
 przeniesś wcześniej utworzone blog, RSS, SITEMAP
 

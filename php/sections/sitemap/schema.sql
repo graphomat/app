@@ -1,6 +1,6 @@
 -- Sitemap section configuration
-INSERT INTO sections (name, title, description, sort_order) VALUES
-('sitemap', 'Sitemap Section', 'XML sitemap generation', 98);
+INSERT OR REPLACE INTO sections (name, title, description, type, sort_order) VALUES
+('sitemap', 'Sitemap Section', 'XML sitemap generation', 'sitemap', 98);
 
 -- Sitemap settings table schema
 CREATE TABLE sitemap_settings (
