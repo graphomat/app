@@ -39,6 +39,8 @@ if [ ! -f .env ]; then
     fi
 fi
 
+rm database.sqlite
+
 # Run the PHP installer
 echo "Running database installation..."
 INSTALL_RESULT=$(php install.php)

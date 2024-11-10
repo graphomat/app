@@ -28,7 +28,10 @@ $page = $_GET['page'] ?? 'dashboard';
             <ul class="nav-menu">
                 <li><a href="?page=dashboard" <?php echo $page === 'dashboard' ? 'class="active"' : ''; ?>>Dashboard</a></li>
                 <li><a href="?page=content" <?php echo $page === 'content' ? 'class="active"' : ''; ?>>Content</a></li>
+                <li><a href="?page=sections" <?php echo $page === 'sections' ? 'class="active"' : ''; ?>>Sections</a></li>
+                <li><a href="?page=pages" <?php echo $page === 'pages' ? 'class="active"' : ''; ?>>Pages</a></li>
                 <li><a href="?page=menu" <?php echo $page === 'menu' ? 'class="active"' : ''; ?>>Menu</a></li>
+                <li><a href="?page=components" <?php echo $page === 'components' ? 'class="active"' : ''; ?>>Components</a></li>
                 <li><a href="?page=seo" <?php echo $page === 'seo' ? 'class="active"' : ''; ?>>SEO</a></li>
                 <li><a href="?page=config" <?php echo $page === 'config' ? 'class="active"' : ''; ?>>Configuration</a></li>
                 <li><a href="?page=media" <?php echo $page === 'media' ? 'class="active"' : ''; ?>>Media</a></li>
@@ -89,6 +92,24 @@ $page = $_GET['page'] ?? 'dashboard';
             } catch (error) {
                 alert(error.message);
             }
+        };
+
+        // Success message helper
+        const showSuccess = (message) => {
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success';
+            alert.textContent = message;
+            document.querySelector('.main-content').prepend(alert);
+            setTimeout(() => alert.remove(), 3000);
+        };
+
+        // Error message helper
+        const showError = (message) => {
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-danger';
+            alert.textContent = message;
+            document.querySelector('.main-content').prepend(alert);
+            setTimeout(() => alert.remove(), 3000);
         };
     </script>
 </body>

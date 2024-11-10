@@ -22,9 +22,49 @@ Dodaj sekcję footer,
 Dodaj sekcję menu, categories, tags, article, blog
 Dodaj sekcję sitemap, rss, do wyswietlania mapy strony w xml i rss rozszerzeniem odpowiednim dla danej sekcji z administracją i sql, obie sekcje powinny korzystać z sekcji menu, categories, article, tags
 
+Stworz mechanizm dodawania komponentów w folderze components/,
+Dodaj component 'upload', 'files', 'gallery' i wygeneruj takie, ktore mozna reuzywac w podstronach, sekcjach, stworz przyklad w sections uzycia component 
+
+
+Do kazdego component-u dodaj plik admin.php, oraz api.php z curl.sh do testowania z prostym generowatorem tokenow do uwierzytelnionej komunikacji
+
+pozwol na zarzadzanie każdą stroną na podstawie struktury component i sections w panelu administracyjnym, zaktualizuj sql i uzyj admin.php z modulow z section i components
+
+plik ./schema.sql nie powinien zawierac juz raz zdeklarowanych tabeli z component lub sections np z /sections/rss/schema.sql, gdyż każda scehma z modułu powinna być załadowana oddzielnie i tam powinny znajdować sie dane dotyczące tabeli do konrkretnego modułu
+
+panel administracyjny admin/index.php powinien mieć menu do wyboru sections.php gdzie będą edytowane ładowane sekcje z folderu sections/*/admin.php
+
+panel administracyjny admin/index.php powinien mieć menu do wyboru component.php gdzie będą edytowane ładowane komponenty z folderu component/*/admin.php
+
+
+
+Stworz folder na kompletne aplikacje/strony niezalezne moduły typu: blog, RSS, SITEMAP, które korzystaja z danych strony
+przeniesś wcześniej utworzone blog, RSS, SITEMAP
+
+
+Stworz folder na funkcje przetwazrania danych w locie i integracji z frameworkiem/sql, nazwij go odpowiednio i dodaj: shortcode, webhooks, API, ktore bedą integrowały się z sections, pokaż przykłady użycia jak skonfigurowac i uzywac w sekcjach, np przy wyswietlaniu filmu z youtube  oraz translacji treści do innych języków pobieranych z sql
+zaktualizuj panel administracji do tego rozwiazania
+
+
+
+
+
+
+w trakcie instalacji przez install.sh pojawił się błąd:
+Running database installation...
+Installation failed with errors:
+SQL Error: UNIQUE constraint failed: config.name
+Statement: -- Initial footer configuration
+INSERT INTO config (name, value, type, description) VALUES
+('footer_copyright', '© 2024 DBT Unity. Все права защищены.', 'text', 'Footer copyright text'),
+('footer_description', 'Комплексная ДБТ терапия для эффективного управления эмоциями', 'textarea', 'Footer description'),
+('footer_columns', '3', 'number', 'Number of footer link columns'),
+('footer_logo', 'img/unitydbt-logo.png', 'text', 'Footer logo image path')
+
 NOCODE
 
-Dodaj sekcje kontakt
+Dodaj sekcje kontakt, gdzie bedzie formularz zapytania z obslugą SMTP i zapisaniem haseł w panelu z SQL oraz testem w panelu poprzez test.php
+Dodaj do kazdej sekcji plik test.php, ktory pozwoli na przetestowanie modulu pod wzgledem mozliwosci zainstalowania, powinny pokazywac sie new try Exceptions
 
 Dodaj rss
 

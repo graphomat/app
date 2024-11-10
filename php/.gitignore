@@ -2,6 +2,7 @@ database.sqlite-shm
 database.sqlite-wal
 composer.lock
 database.sqlite
+vendor
 .idea
 # Byte-compiled / optimized / DLL files
 __pycache__/

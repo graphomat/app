@@ -6,11 +6,26 @@ class Api {
     protected $db;
     protected $table;
     protected $allowedFields = [];
+    private static $endpoints = [];
 
-    public function __construct($table, $allowedFields = []) {
+    public function __construct($table = null, $allowedFields = []) {
         $this->db = Database::getInstance()->getConnection();
         $this->table = $table;
         $this->allowedFields = $allowedFields;
+    }
+
+    protected function validateRequired($required, $data) {
+        foreach ($required as $field) {
+            if (!isset($data[$field]) || empty($data[$field])) {
+                throw new Exception("Missing required field: $field", 400);
+            }
+        }
+    }
+
+    protected function validateId($id) {
+        if (!$id || !is_numeric($id)) {
+            throw new Exception("Invalid ID provided", 400);
+        }
     }
 
     protected function sanitizeInput($data) {
@@ -174,6 +189,14 @@ class Api {
             error_log('Delete error: ' . $e->getMessage());
             throw new Exception('Failed to delete record');
         }
+    }
+
+    public static function registerEndpoint($name, $endpoint) {
+        self::$endpoints[$name] = $endpoint;
+    }
+
+    public static function getEndpoint($name) {
+        return isset(self::$endpoints[$name]) ? self::$endpoints[$name] : null;
     }
 
     public function handleRequest($method = null) {

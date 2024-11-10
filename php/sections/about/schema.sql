@@ -1,6 +1,6 @@
 -- About section configuration
-INSERT INTO sections (name, title, description, sort_order) VALUES
-('about', 'About Section', 'Information about the team and certification', 3);
+INSERT OR REPLACE INTO sections (name, title, description, type, sort_order) VALUES
+('about', 'About Section', 'Information about the team and certification', 'about', 3);
 
 -- Team members table schema and data
 CREATE TABLE team_members (
