@@ -1,6 +1,16 @@
 <?php
-// training.php
+// index.php
 session_start();
+
+// Basic configuration
+$config = [
+    'site_name' => 'DBT Unity - Диалектическая поведенческая терапия',
+    'site_description' => 'Комплексная ДБТ терапия в России. Профессиональная помощь в управлении эмоциями, работа с ПРЛ, БАР и другими расстройствами.',
+    'contact_email' => 'info@dbt-unity.com',
+    'contact_phone' => '+1 (234) 567-890',
+    'keywords' => 'ДБТ, диалектическая поведенческая терапия, ПРЛ, пограничное расстройство личности, БАР, управление эмоциями, психотерапия',
+    'author' => 'DBT Unity Team'
+];
 ?>
 
 <!DOCTYPE html>
@@ -9,170 +19,68 @@ session_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Тренинг навыков ДБТ | DBT Unity</title>
-    <style>
-        :root {
-            --primary-color: #0a1657;
-            --secondary-color: #ffffff;
-            --accent-color: #4A90E2;
-        }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="<?php echo $config['site_description']; ?>">
+    <meta name="keywords" content="<?php echo $config['keywords']; ?>">
+    <meta name="author" content="<?php echo $config['author']; ?>">
 
-        /* Header styles from main page */
-        .header {
-            background-color: var(--primary-color);
-            padding: 1rem 0;
-            width: 100%;
-        }
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="<?php echo $config['site_name']; ?>">
+    <meta property="og:description" content="<?php echo $config['site_description']; ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://dbt-unity.com">
+    <meta property="og:image" content="https://dbt-unity.com/img/unitydbt-logo.png">
 
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 2rem;
-        }
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?php echo $config['site_name']; ?>">
+    <meta name="twitter:description" content="<?php echo $config['site_description']; ?>">
+    <meta name="twitter:image" content="https://dbt-unity.com/img/unitydbt-logo.png">
 
-        .nav-menu {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dbt-unity.com">
 
-        .nav-menu a {
-            color: var(--secondary-color);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="img/favicon.png">
 
-        /* Training section specific styles */
-        .training-section {
-            max-width: 1200px;
-            margin: 3rem auto;
-            padding: 0 2rem;
-        }
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
 
-        .training-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-            margin: 2rem 0;
-        }
-
-        .training-content {
-            padding-right: 2rem;
-        }
-
-        .training-content h1 {
-            font-size: 3rem;
-            color: var(--primary-color);
-            margin-bottom: 1.5rem;
-            line-height: 1.2;
-        }
-
-        .training-details {
-            margin: 2rem 0;
-        }
-
-        .training-details p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-            color: #333;
-        }
-
-        .training-image {
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .training-image img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .cta-button {
-            display: inline-block;
-            padding: 1.2rem 2.5rem;
-            background-color: var(--primary-color);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-top: 2rem;
-            transition: background-color 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .cta-button:hover {
-            background-color: #162276;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 2rem;
-            margin-top: 4rem;
-        }
-
-        .feature-card {
-            background: #f8f9fa;
-            padding: 2rem;
-            border-radius: 15px;
-            transition: transform 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .feature-card h3 {
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-        }
-
-        .feature-card p {
-            color: #666;
-            line-height: 1.6;
-        }
-
-        @media (max-width: 768px) {
-            .training-grid {
-                grid-template-columns: 1fr;
-                gap: 2rem;
+    <!-- Schema.org markup -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "MedicalOrganization",
+        "name": "<?php echo $config['site_name']; ?>",
+        "description": "<?php echo $config['site_description']; ?>",
+        "url": "https://dbt-unity.com",
+        "logo": "https://dbt-unity.com/img/unitydbt-logo.png",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "<?php echo $config['contact_phone']; ?>",
+            "email": "<?php echo $config['contact_email']; ?>",
+            "contactType": "customer service"
+        },
+        "medicalSpecialty": ["Психотерапия", "Диалектическая поведенческая терапия"],
+        "availableService": [
+            {
+                "@type": "MedicalTherapy",
+                "name": "Индивидуальная терапия",
+                "description": "Индивидуальные сессии с личным терапевтом"
+            },
+            {
+                "@type": "MedicalTherapy",
+                "name": "Групповой тренинг",
+                "description": "Групповые занятия по развитию навыков"
             }
-
-            .training-content {
-                padding-right: 0;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .training-content h1 {
-                font-size: 2rem;
-            }
-        }
-    </style>
+        ]
+    }
+    </script>
 </head>
 <body>
 
 <?php include 'menu-section.php'; ?>
-
 
 <!-- Training Section -->
 <section class="training-section">
@@ -217,104 +125,6 @@ session_start();
         </div>
     </div>
 </section>
-
-<!-- Add this section after the features-grid in the previous code -->
-<style>
-    .schedule-section {
-        padding: 5rem 0;
-        background-color: #f8f9fa;
-        margin-top: 4rem;
-    }
-
-    .schedule-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 2rem;
-    }
-
-    .schedule-header {
-        text-align: center;
-        margin-bottom: 4rem;
-    }
-
-    .schedule-header h2 {
-        font-size: 2.5rem;
-        color: var(--primary-color);
-        text-transform: uppercase;
-        margin-bottom: 1.5rem;
-    }
-
-    .schedule-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 3rem;
-        margin-bottom: 3rem;
-    }
-
-    .group-card {
-        background-color: var(--primary-color);
-        color: white;
-        padding: 2.5rem;
-        border-radius: 15px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .group-card h3 {
-        font-size: 2rem;
-        margin-bottom: 2rem;
-        font-weight: 500;
-        border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-        padding-bottom: 1rem;
-    }
-
-    .group-time {
-        font-size: 1.25rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .group-leaders {
-        margin-bottom: 1.5rem;
-        line-height: 1.6;
-    }
-
-    .group-price {
-        margin-bottom: 1.5rem;
-        line-height: 1.6;
-    }
-
-    .group-status {
-        font-style: italic;
-        color: rgba(255, 255, 255, 0.8);
-    }
-
-    .schedule-cta {
-        text-align: center;
-        margin-top: 3rem;
-    }
-
-    .available {
-        color: #4CAF50;
-    }
-
-    .waitlist {
-        color: #FFC107;
-    }
-
-    @media (max-width: 768px) {
-        .schedule-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .schedule-header h2 {
-            font-size: 2rem;
-        }
-
-        .group-card {
-            padding: 2rem;
-        }
-    }
-</style>
 
 <section class="schedule-section">
     <div class="schedule-container">
@@ -361,125 +171,6 @@ session_start();
         </div>
     </div>
 </section>
-
-
-
-<!-- Add this section after the schedule section -->
-<style>
-    .modules-section {
-        padding: 5rem 0;
-        background-color: white;
-    }
-
-    .modules-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 2rem;
-    }
-
-    .modules-header {
-        text-align: center;
-        margin-bottom: 4rem;
-    }
-
-    .modules-header h2 {
-        font-size: 2.5rem;
-        color: var(--primary-color);
-        text-transform: uppercase;
-        margin-bottom: 1.5rem;
-    }
-
-    .modules-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 2rem;
-    }
-
-    .module-card {
-        text-align: center;
-        padding: 2rem;
-        border-radius: 15px;
-        background: white;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .module-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-
-    .module-icon {
-        width: 120px;
-        height: 120px;
-        margin: 0 auto 1.5rem;
-    }
-
-    .module-icon img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-    }
-
-    .module-title {
-        color: var(--primary-color);
-        font-size: 1.1rem;
-        font-weight: bold;
-        margin-bottom: 1rem;
-        min-height: 2.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-transform: uppercase;
-    }
-
-    .module-description {
-        font-size: 0.9rem;
-        line-height: 1.6;
-        color: #666;
-    }
-
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .module-card {
-        animation: fadeInUp 0.5s ease forwards;
-        opacity: 0;
-    }
-
-    .module-card:nth-child(1) { animation-delay: 0.1s; }
-    .module-card:nth-child(2) { animation-delay: 0.2s; }
-    .module-card:nth-child(3) { animation-delay: 0.3s; }
-    .module-card:nth-child(4) { animation-delay: 0.4s; }
-
-    @media (max-width: 1024px) {
-        .modules-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (max-width: 640px) {
-        .modules-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .modules-header h2 {
-            font-size: 2rem;
-        }
-
-        .module-title {
-            min-height: auto;
-        }
-    }
-</style>
 
 <section class="modules-section">
     <div class="modules-container">
@@ -543,112 +234,6 @@ session_start();
     </div>
 </section>
 
-
-
-<!-- Add this section after the modules section -->
-<style>
-    .indications-section {
-        padding: 5rem 0;
-        background: var(--primary-color);
-        color: white;
-    }
-
-    .indications-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 2rem;
-        display: grid;
-        grid-template-columns: 1fr 2fr;
-        gap: 4rem;
-        align-items: start;
-    }
-
-    .indications-title {
-        position: sticky;
-        top: 2rem;
-    }
-
-    .indications-title h2 {
-        font-size: 3rem;
-        line-height: 1.2;
-        margin-bottom: 2rem;
-    }
-
-    .indications-list {
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-    }
-
-    .indication-item {
-        padding: 2rem;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 15px;
-        backdrop-filter: blur(10px);
-        transition: transform 0.3s ease, background-color 0.3s ease;
-    }
-
-    .indication-item:hover {
-        transform: translateX(10px);
-        background: rgba(255, 255, 255, 0.15);
-    }
-
-    .indication-item p {
-        font-size: 1.1rem;
-        line-height: 1.6;
-    }
-
-    .divider {
-        height: 2px;
-        background: rgba(255, 255, 255, 0.1);
-        margin: 1rem 0;
-        width: 100%;
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    .indication-item {
-        animation: slideIn 0.5s ease forwards;
-        opacity: 0;
-    }
-
-    .indication-item:nth-child(1) { animation-delay: 0.1s; }
-    .indication-item:nth-child(2) { animation-delay: 0.2s; }
-    .indication-item:nth-child(3) { animation-delay: 0.3s; }
-    .indication-item:nth-child(4) { animation-delay: 0.4s; }
-    .indication-item:nth-child(5) { animation-delay: 0.5s; }
-    .indication-item:nth-child(6) { animation-delay: 0.6s; }
-
-    @media (max-width: 968px) {
-        .indications-container {
-            grid-template-columns: 1fr;
-            gap: 2rem;
-        }
-
-        .indications-title {
-            position: static;
-            text-align: center;
-        }
-
-        .indications-title h2 {
-            font-size: 2rem;
-        }
-
-        .indication-item:hover {
-            transform: translateY(-5px);
-        }
-    }
-</style>
-
 <section class="indications-section">
     <div class="indications-container">
         <div class="indications-title">
@@ -689,11 +274,8 @@ session_start();
     </div>
 </section>
 
-
-
 <!-- Footer -->
 <?php include 'footer2.php'; ?>
-
 
 </body>
 </html>

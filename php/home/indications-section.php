@@ -33,102 +33,18 @@ $dbtIndications = [
 ];
 ?>
 
-<style>
-    .indications-section {
-        background-color: #0a1657;
-        color: white;
-        padding: 5rem 0;
-    }
-
-    .indications-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 2rem;
-    }
-
-    .section-header {
-        text-align: center;
-        margin-bottom: 4rem;
-    }
-
-    .section-header h2 {
-        font-size: 2.5rem;
-        margin-bottom: 1.5rem;
-        font-weight: 500;
-    }
-
-    .indications-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 2rem;
-    }
-
-    .indication-card {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-        padding: 2rem;
-        transition: transform 0.3s ease, background-color 0.3s ease;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .indication-card::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
-        transform: translateX(-100%);
-        transition: transform 0.5s ease;
-    }
-
-    .indication-card:hover {
-        transform: translateY(-5px);
-        background: rgba(255, 255, 255, 0.15);
-    }
-
-    .indication-card:hover::after {
-        transform: translateX(100%);
-    }
-
-    .indication-title {
-        font-size: 1.2rem;
-        margin-bottom: 1rem;
-        font-weight: 500;
-    }
-
-    .indication-description {
-        font-size: 1rem;
-        line-height: 1.6;
-        opacity: 0.9;
-    }
-
-    @media (max-width: 768px) {
-        .indications-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .section-header h2 {
-            font-size: 2rem;
-        }
-    }
-</style>
-
-<section class="indications-section">
+<section class="indications-section" aria-labelledby="indications-heading">
     <div class="indications-container">
-        <div class="section-header">
-            <h2>Кому показана комплексная ДБТ программа</h2>
-        </div>
+        <header class="section-header">
+            <h2 id="indications-heading">Кому показана комплексная ДБТ программа</h2>
+        </header>
 
-        <div class="indications-grid">
+        <div class="indications-grid" role="list">
             <?php foreach($dbtIndications as $indication): ?>
-                <div class="indication-card">
+                <article class="indication-card" role="listitem">
                     <h3 class="indication-title"><?php echo htmlspecialchars($indication['title']); ?></h3>
                     <p class="indication-description"><?php echo htmlspecialchars($indication['description']); ?></p>
-                </div>
+                </article>
             <?php endforeach; ?>
         </div>
     </div>
@@ -137,13 +53,15 @@ $dbtIndications = [
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const cards = document.querySelectorAll('.indication-card');
-
+        
         // Add animation when cards come into view
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.style.opacity = '1';
                     entry.target.style.transform = 'translateY(0)';
+                    // Add ARIA live region announcement for screen readers
+                    entry.target.setAttribute('aria-live', 'polite');
                 }
             });
         }, {
@@ -155,6 +73,14 @@ $dbtIndications = [
             card.style.transform = 'translateY(20px)';
             card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
             observer.observe(card);
+            
+            // Add keyboard interaction
+            card.setAttribute('tabindex', '0');
+            card.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    this.click();
+                }
+            });
         });
     });
 </script>

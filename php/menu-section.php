@@ -8,150 +8,113 @@ $navigation = [
     'training' => 'ТРЕНИНГ НАВЫКОВ',
     'specialists' => 'СПЕЦИАЛИСТЫ',
     'about-dbt' => 'ЧТО ТАКОЕ ДБТ',
-//    'services' => 'ЧТО ТАКОЕ ДБТ',
     'contact' => 'КОНТАКТЫ'
 ];
 ?>
 
-<?php
-/*
-// Navigation items array - can be managed from backend
-$navigation = [
-    'about' => 'O NAS',
-    'training' => 'TRENING',
-    'specialists' => 'SPECJALIŚCI',
-    'services' => 'USŁUGI',
-    'contact' => 'KONTAKT'
-];*/
-?>
-
-
-<style>
-    :root {
-        --primary-color: #0a1657;
-        --secondary-color: #ffffff;
-    }
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: Arial, sans-serif;
-    }
-
-    .header {
-        background-color: var(--primary-color);
-        padding: 1rem 0;
-        width: 100%;
-    }
-
-    .nav-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 2rem;
-    }
-
-    .nav-menu {
-        display: flex;
-        gap: 2rem;
-        list-style: none;
-    }
-
-    .nav-menu a {
-        color: var(--secondary-color);
-        text-decoration: none;
-        font-size: 0.9rem;
-        font-weight: 500;
-        transition: opacity 0.3s;
-    }
-
-    .nav-menu a:hover {
-        opacity: 0.8;
-    }
-
-    .hero-section {
-        padding: 4rem 2rem;
-        max-width: 1200px;
-        margin: 0 auto;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .hero-content {
-        flex: 1;
-        padding-right: 2rem;
-    }
-
-    .hero-content h1 {
-        color: var(--primary-color);
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .hero-content p {
-        color: #666;
-        margin-bottom: 2rem;
-    }
-
-    .cta-button {
-        background-color: var(--primary-color);
-        color: var(--secondary-color);
-        padding: 1rem 2rem;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        text-transform: uppercase;
-        font-weight: bold;
-        transition: background-color 0.3s;
-    }
-
-    .cta-button:hover {
-        background-color: #162276;
-    }
-
-    .hero-image {
-        flex: 1;
-        text-align: right;
-    }
-
-    @media (max-width: 768px) {
-        .nav-menu {
-            display: none;
-        }
-
-        .hero-section {
-            flex-direction: column;
-            text-align: center;
-        }
-
-        .hero-content {
-            padding-right: 0;
-            margin-bottom: 2rem;
-        }
-    }
-</style>
-
-<header class="header">
-    <nav class="nav-container">
+<header class="header" role="banner">
+    <nav class="nav-container" role="navigation" aria-label="Главное меню">
         <div class="logo">
-            <!-- Logo can be managed from backend -->
-<!--            <img src="logo.svg" alt="Logo" height="40">-->
-            <a href="/" style="color: white; text-decoration: none; font-weight: bold; font-size: 1.5rem;">
-                DBT Unity
-            </a>
-
+            <a href="/" aria-label="DBT Unity - Вернуться на главную">DBT Unity</a>
         </div>
-        <ul class="nav-menu">
+        
+        <button class="mobile-menu-toggle" 
+                aria-label="Открыть меню" 
+                aria-expanded="false"
+                aria-controls="main-menu">
+            <span class="hamburger"></span>
+            <span class="sr-only">Меню</span>
+        </button>
+        
+        <ul class="nav-menu" id="main-menu" role="menubar">
             <?php foreach ($navigation as $key => $item): ?>
-                <li><a href="<?php echo $key; ?>.php"><?php echo htmlspecialchars($item); ?></a></li>
+                <li role="none">
+                    <a href="<?php echo $key; ?>.php" 
+                       role="menuitem"
+                       <?php echo $key === 'index' && !isset($_GET['page']) ? 'aria-current="page"' : ''; ?>>
+                        <?php echo htmlspecialchars($item); ?>
+                    </a>
+                </li>
             <?php endforeach; ?>
         </ul>
     </nav>
 </header>
 
+<!-- Add styles for screen reader only class -->
+<style>
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+</style>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    const header = document.querySelector('.header');
 
+    mobileMenuToggle.addEventListener('click', function() {
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        this.setAttribute('aria-expanded', !isExpanded);
+        navMenu.classList.toggle('active');
+        mobileMenuToggle.classList.toggle('active');
+        header.classList.toggle('menu-open');
+        
+        // Update button label for screen readers
+        this.setAttribute('aria-label', isExpanded ? 'Открыть меню' : 'Закрыть меню');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!header.contains(event.target) && navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+            mobileMenuToggle.classList.remove('active');
+            header.classList.remove('menu-open');
+            mobileMenuToggle.setAttribute('aria-expanded', 'false');
+            mobileMenuToggle.setAttribute('aria-label', 'Открыть меню');
+        }
+    });
+
+    // Handle keyboard navigation
+    navMenu.addEventListener('keydown', function(e) {
+        const menuItems = navMenu.querySelectorAll('[role="menuitem"]');
+        const currentItem = document.activeElement;
+        const currentIndex = Array.from(menuItems).indexOf(currentItem);
+
+        switch (e.key) {
+            case 'ArrowRight':
+            case 'ArrowDown':
+                e.preventDefault();
+                if (currentIndex < menuItems.length - 1) {
+                    menuItems[currentIndex + 1].focus();
+                } else {
+                    menuItems[0].focus();
+                }
+                break;
+            case 'ArrowLeft':
+            case 'ArrowUp':
+                e.preventDefault();
+                if (currentIndex > 0) {
+                    menuItems[currentIndex - 1].focus();
+                } else {
+                    menuItems[menuItems.length - 1].focus();
+                }
+                break;
+            case 'Escape':
+                if (navMenu.classList.contains('active')) {
+                    mobileMenuToggle.click();
+                    mobileMenuToggle.focus();
+                }
+                break;
+        }
+    });
+});
+</script>

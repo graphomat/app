@@ -24,117 +24,46 @@ $certificationDetails = [
 ];
 ?>
 
-<style>
-    .about-section {
-        max-width: 1200px;
-        margin: 4rem auto;
-        padding: 0 2rem;
-    }
-
-    .about-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 4rem;
-        align-items: start;
-    }
-
-    .about-content {
-        color: #333;
-    }
-
-    .about-content h2 {
-        font-size: 2.5rem;
-        color: #0a1657;
-        margin-bottom: 1.5rem;
-    }
-
-    .about-content p {
-        font-size: 1.1rem;
-        line-height: 1.6;
-        margin-bottom: 1.5rem;
-    }
-
-    .certification-card {
-        background: #fff;
-        border-radius: 10px;
-        padding: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-
-    .certification-logo {
-        width: 200px;
-        margin-bottom: 1.5rem;
-    }
-
-    .certification-details {
-        margin-top: 1.5rem;
-    }
-
-    .certification-details h3 {
-        color: #0a1657;
-        font-size: 1.2rem;
-        margin-bottom: 1rem;
-    }
-
-    .team-list {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-        margin-top: 1rem;
-    }
-
-    .team-member {
-        background: #f8f9fa;
-        padding: 0.75rem 1rem;
-        border-radius: 5px;
-        font-size: 0.9rem;
-    }
-
-    .highlight-text {
-        color: #0a1657;
-        font-weight: bold;
-    }
-
-    @media (max-width: 768px) {
-        .about-grid {
-            grid-template-columns: 1fr;
-            gap: 2rem;
-        }
-
-        .team-list {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-
-<section class="about-section">
+<section class="about-section" aria-labelledby="about-heading">
     <div class="about-grid">
         <div class="about-content">
-            <h2>O НАС</h2>
-            <p>В 2024 году наша команда прошла обучение диалектической поведенческой терапии от Behavioral Tech под руководством преподавателей: André Ivanoff и Дмитрия Пушкарева.</p>
+            <h2 id="about-heading">O НАС</h2>
+            <p>В 2024 году наша команда прошла обучение диалектической поведенческой терапии от Behavioral Tech под
+                руководством преподавателей: André Ivanoff и Дмитрия Пушкарева.</p>
 
-            <div class="certification-details">
-                <h3>Наша команда сертифицированных специалистов:</h3>
-                <div class="team-list">
-                    <?php foreach($teamMembers as $member): ?>
-                        <div class="team-member"><?php echo htmlspecialchars($member); ?></div>
+            <div class="certification-details" aria-labelledby="team-heading">
+                <h3 id="team-heading">Наша команда сертифицированных специалистов:</h3>
+                <div class="team-list" role="list">
+                    <?php foreach ($teamMembers as $member): ?>
+                        <div class="team-member" role="listitem"><?php echo htmlspecialchars($member); ?></div>
                     <?php endforeach; ?>
                 </div>
             </div>
         </div>
 
-        <div class="certification-card">
-            <img src="/assets/behavioral-tech-logo.svg" alt="Behavioral Tech Institute" class="certification-logo">
+        <div class="certification-card" aria-labelledby="cert-heading">
+            <a href="Cert_Unity_241108_073542.pdf" aria-label="Посмотреть сертификат Behavioral Tech Institute">
+                <img src="img/unitydbt-cert.png" 
+                     alt="Сертификат DBT Intensive Training от Behavioral Tech Institute" 
+                     class="certification-logo"
+                     height="350">
+            </a>
 
             <div class="certification-details">
-                <h3>DBT Intensive Training</h3>
-                <p><span class="highlight-text">Часть 1:</span> <?php echo htmlspecialchars($certificationDetails['dates']['part1']); ?></p>
-                <p><span class="highlight-text">Часть 2:</span> <?php echo htmlspecialchars($certificationDetails['dates']['part2']); ?></p>
+                <h3 id="cert-heading">DBT Intensive Training</h3>
+                <p>
+                    <span class="highlight-text">Часть 1:</span> <?php echo htmlspecialchars($certificationDetails['dates']['part1']); ?>
+                </p>
+                <p>
+                    <span class="highlight-text">Часть 2:</span> <?php echo htmlspecialchars($certificationDetails['dates']['part2']); ?>
+                </p>
 
-                <h3>Преподаватели:</h3>
-                <?php foreach($certificationDetails['instructors'] as $instructor): ?>
-                    <p><?php echo htmlspecialchars($instructor); ?></p>
-                <?php endforeach; ?>
+                <h3 id="instructors-heading">Преподаватели:</h3>
+                <div role="list" aria-labelledby="instructors-heading">
+                    <?php foreach ($certificationDetails['instructors'] as $instructor): ?>
+                        <p role="listitem"><?php echo htmlspecialchars($instructor); ?></p>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
     </div>
