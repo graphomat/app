@@ -2,6 +2,7 @@ database.sqlite-shm
 database.sqlite-wal
 composer.lock
 database.sqlite
+diagnostic_errors.json
 vendor
 .idea
 # Byte-compiled / optimized / DLL files
