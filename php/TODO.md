@@ -69,27 +69,22 @@ Dodaj przykladowe dane dom sekcji meta w schema.sql na podstawie pliku header.ph
 Stworz folder na kompletne aplikacje/strony niezalezne moduły typu: blog, RSS, SITEMAP, które korzystaja z danych strony
 przeniesś wcześniej utworzone blog, RSS, SITEMAP
 
+Dodaj więcej funkcji testowania api/ i admin/ poprzez uruchomienie skryptu ./test.sh
 
-Stworz folder na funkcje przetwazrania danych w locie i integracji z frameworkiem/sql, nazwij go odpowiednio i dodaj: shortcode, webhooks, API, ktore bedą integrowały się z sections, pokaż przykłady użycia jak skonfigurowac i uzywac w sekcjach, np przy wyswietlaniu filmu z youtube  oraz translacji treści do innych języków pobieranych z sql
+
+Stworz folder na funkcje przetwarzania danych w locie i integracji z frameworkiem/sql, nazwij go odpowiednio i dodaj: shortcode, webhooks, API, ktore bedą integrowały się z sections, pokaż przykłady użycia jak skonfigurowac i uzywac w sekcjach, np przy wyswietlaniu filmu z youtube  oraz translacji treści do innych języków pobieranych z sql
 zaktualizuj panel administracji do tego rozwiazania
 
 
+Przebuduj panel admin aby był modularny i składał się z integrations, components, modules, sections
+Stwórz odseparowaną bazę danych dla administracji i dla projektów stron użytkownika
 
 
 
 
+W folderze admin jest oddzielna aplikacja do zarządzania stroną, gdzie mają dostęp tylko zalogowani użytkownicy
 
 
-w trakcie instalacji przez install.sh pojawił się błąd:
-Running database installation...
-Installation failed with errors:
-SQL Error: UNIQUE constraint failed: config.name
-Statement: -- Initial footer configuration
-INSERT INTO config (name, value, type, description) VALUES
-('footer_copyright', '© 2024 DBT Unity. Все права защищены.', 'text', 'Footer copyright text'),
-('footer_description', 'Комплексная ДБТ терапия для эффективного управления эмоциями', 'textarea', 'Footer description'),
-('footer_columns', '3', 'number', 'Number of footer link columns'),
-('footer_logo', 'img/unitydbt-logo.png', 'text', 'Footer logo image path')
 
 NOCODE
 

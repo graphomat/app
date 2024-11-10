@@ -3,15 +3,26 @@ class MetaQuery {
     private $db;
 
     public function __construct($db) {
+        // Store the SQLite3 connection
         $this->db = $db;
     }
 
     public function getMetaByPageId($pageId) {
-        $stmt = $this->db->prepare("SELECT * FROM meta WHERE page_id = ?");
-        $stmt->bind_param("s", $pageId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_assoc();
+        $stmt = $this->db->prepare("SELECT * FROM meta WHERE page_id = :page_id");
+        if (!$stmt) {
+            error_log("Failed to prepare statement: " . $this->db->lastErrorMsg());
+            return null;
+        }
+        
+        $stmt->bindValue(':page_id', $pageId, SQLITE3_TEXT);
+        $result = $stmt->execute();
+        
+        if (!$result) {
+            error_log("Failed to execute statement: " . $this->db->lastErrorMsg());
+            return null;
+        }
+        
+        return $result->fetchArray(SQLITE3_ASSOC);
     }
 
     public function updateMeta($data) {
@@ -22,56 +33,84 @@ class MetaQuery {
                 twitter_card, twitter_site, twitter_creator, twitter_title, twitter_description, twitter_image,
                 canonical_url
             ) VALUES (
-                ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?,
-                ?
-            ) ON DUPLICATE KEY UPDATE
-                title = VALUES(title),
-                description = VALUES(description),
-                keywords = VALUES(keywords),
-                author = VALUES(author),
-                robots = VALUES(robots),
-                og_title = VALUES(og_title),
-                og_description = VALUES(og_description),
-                og_image = VALUES(og_image),
-                og_type = VALUES(og_type),
-                twitter_card = VALUES(twitter_card),
-                twitter_site = VALUES(twitter_site),
-                twitter_creator = VALUES(twitter_creator),
-                twitter_title = VALUES(twitter_title),
-                twitter_description = VALUES(twitter_description),
-                twitter_image = VALUES(twitter_image),
-                canonical_url = VALUES(canonical_url)
+                :page_id, :title, :description, :keywords, :author, :robots,
+                :og_title, :og_description, :og_image, :og_type,
+                :twitter_card, :twitter_site, :twitter_creator, :twitter_title, :twitter_description, :twitter_image,
+                :canonical_url
+            ) ON CONFLICT(page_id) DO UPDATE SET
+                title = :title,
+                description = :description,
+                keywords = :keywords,
+                author = :author,
+                robots = :robots,
+                og_title = :og_title,
+                og_description = :og_description,
+                og_image = :og_image,
+                og_type = :og_type,
+                twitter_card = :twitter_card,
+                twitter_site = :twitter_site,
+                twitter_creator = :twitter_creator,
+                twitter_title = :twitter_title,
+                twitter_description = :twitter_description,
+                twitter_image = :twitter_image,
+                canonical_url = :canonical_url,
+                updated_at = CURRENT_TIMESTAMP
         ");
 
-        $stmt->bind_param(
-            "sssssssssssssssss",
-            $data['page_id'],
-            $data['title'],
-            $data['description'],
-            $data['keywords'],
-            $data['author'],
-            $data['robots'],
-            $data['og_title'],
-            $data['og_description'],
-            $data['og_image'],
-            $data['og_type'],
-            $data['twitter_card'],
-            $data['twitter_site'],
-            $data['twitter_creator'],
-            $data['twitter_title'],
-            $data['twitter_description'],
-            $data['twitter_image'],
-            $data['canonical_url']
-        );
+        if (!$stmt) {
+            error_log("Failed to prepare statement: " . $this->db->lastErrorMsg());
+            return false;
+        }
 
-        return $stmt->execute();
+        $params = [
+            ':page_id' => $data['page_id'],
+            ':title' => $data['title'] ?? null,
+            ':description' => $data['description'] ?? null,
+            ':keywords' => $data['keywords'] ?? null,
+            ':author' => $data['author'] ?? null,
+            ':robots' => $data['robots'] ?? null,
+            ':og_title' => $data['og_title'] ?? null,
+            ':og_description' => $data['og_description'] ?? null,
+            ':og_image' => $data['og_image'] ?? null,
+            ':og_type' => $data['og_type'] ?? null,
+            ':twitter_card' => $data['twitter_card'] ?? null,
+            ':twitter_site' => $data['twitter_site'] ?? null,
+            ':twitter_creator' => $data['twitter_creator'] ?? null,
+            ':twitter_title' => $data['twitter_title'] ?? null,
+            ':twitter_description' => $data['twitter_description'] ?? null,
+            ':twitter_image' => $data['twitter_image'] ?? null,
+            ':canonical_url' => $data['canonical_url'] ?? null
+        ];
+
+        foreach ($params as $param => $value) {
+            $stmt->bindValue($param, $value, SQLITE3_TEXT);
+        }
+
+        $result = $stmt->execute();
+        
+        if (!$result) {
+            error_log("Failed to execute statement: " . $this->db->lastErrorMsg());
+            return false;
+        }
+
+        return true;
     }
 
     public function deleteMeta($pageId) {
-        $stmt = $this->db->prepare("DELETE FROM meta WHERE page_id = ?");
-        $stmt->bind_param("s", $pageId);
-        return $stmt->execute();
+        $stmt = $this->db->prepare("DELETE FROM meta WHERE page_id = :page_id");
+        if (!$stmt) {
+            error_log("Failed to prepare statement: " . $this->db->lastErrorMsg());
+            return false;
+        }
+
+        $stmt->bindValue(':page_id', $pageId, SQLITE3_TEXT);
+        $result = $stmt->execute();
+        
+        if (!$result) {
+            error_log("Failed to execute statement: " . $this->db->lastErrorMsg());
+            return false;
+        }
+
+        return true;
     }
 }

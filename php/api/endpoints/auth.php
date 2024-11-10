@@ -4,62 +4,112 @@ require_once __DIR__ . '/../../config/Database.php';
 
 class Auth {
     private $db;
+    private $secret_key;
+    private $token_lifetime;
 
     public function __construct() {
         $this->db = Database::getInstance();
+        $this->secret_key = getenv('JWT_SECRET') ?: 'default-secret-key-change-in-production';
+        $this->token_lifetime = (int)(getenv('JWT_LIFETIME') ?: 3600);
+    }
+
+    private function generateToken($user_id, $username) {
+        $header = base64_encode(json_encode(['typ' => 'JWT', 'alg' => 'HS256']));
+        $payload = base64_encode(json_encode([
+            'user_id' => $user_id,
+            'username' => $username,
+            'exp' => time() + $this->token_lifetime
+        ]));
+        
+        $signature = hash_hmac('sha256', "$header.$payload", $this->secret_key);
+        return "$header.$payload.$signature";
     }
 
     public function login($username, $password) {
         try {
-            $query = "SELECT id, username, password_hash FROM users WHERE username = :username";
-            $result = $this->db->query($query, [':username' => $username]);
+            if (empty($username) || empty($password)) {
+                return ['success' => false, 'message' => 'Invalid credentials'];
+            }
+
+            $query = "SELECT id, username, password_hash FROM admin_users WHERE username = :username AND is_active = 1";
+            $stmt = $this->db->query($query, [':username' => $username]);
             
-            if ($result) {
-                $user = $result->fetchArray(SQLITE3_ASSOC);
-                if ($user && password_verify($password, $user['password_hash'])) {
-                    // Start session and set user data
-                    session_start();
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['username'] = $user['username'];
-                    return ['success' => true, 'message' => 'Login successful'];
-                }
+            if (!$stmt) {
+                error_log("Database query failed in auth login");
+                return ['success' => false, 'message' => 'Invalid credentials'];
+            }
+
+            $user = $stmt->fetchArray(SQLITE3_ASSOC);
+            if (!$user) {
+                return ['success' => false, 'message' => 'Invalid credentials'];
+            }
+
+            if (!password_verify($password, $user['password_hash'])) {
+                return ['success' => false, 'message' => 'Invalid credentials'];
+            }
+
+            $token = $this->generateToken($user['id'], $user['username']);
+            
+            // Store token in admin_sessions
+            try {
+                $sessionQuery = "INSERT INTO admin_sessions (user_id, token, expires_at) VALUES (:user_id, :token, datetime('now', '+1 hour'))";
+                $this->db->query($sessionQuery, [
+                    ':user_id' => $user['id'],
+                    ':token' => $token
+                ]);
+            } catch (Exception $e) {
+                error_log("Failed to store session: " . $e->getMessage());
+                // Continue even if session storage fails
             }
             
+            return [
+                'success' => true,
+                'token' => $token,
+                'message' => 'Login successful'
+            ];
+            
+        } catch (Exception $e) {
+            error_log("Login error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Invalid credentials'];
-        } catch (Exception $e) {
-            error_log('Login error: ' . $e->getMessage());
-            return ['success' => false, 'message' => 'Login failed'];
         }
     }
 
-    public function logout() {
-        session_start();
-        session_destroy();
-        return ['success' => true, 'message' => 'Logout successful'];
-    }
+    public function handleRequest() {
+        header('Content-Type: application/json');
 
-    public function isAuthenticated() {
-        session_start();
-        return isset($_SESSION['user_id']);
-    }
-
-    public function getCurrentUser() {
-        if (!$this->isAuthenticated()) {
-            return null;
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+            return;
         }
 
-        try {
-            $query = "SELECT id, username, created_at FROM users WHERE id = :id";
-            $result = $this->db->query($query, [':id' => $_SESSION['user_id']]);
-            
-            if ($result) {
-                return $result->fetchArray(SQLITE3_ASSOC);
-            }
-            
-            return null;
-        } catch (Exception $e) {
-            error_log('Get current user error: ' . $e->getMessage());
-            return null;
+        // Get JSON input
+        $json = file_get_contents('php://input');
+        if (!$json) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid request data']);
+            return;
         }
+
+        $data = json_decode($json, true);
+        if (!$data || !isset($data['username']) || !isset($data['password'])) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid request data']);
+            return;
+        }
+
+        $result = $this->login($data['username'], $data['password']);
+        
+        if (!$result['success']) {
+            http_response_code(401);
+        } else {
+            http_response_code(200);
+        }
+        
+        echo json_encode($result);
     }
 }
+
+// Handle the request
+$auth = new Auth();
+$auth->handleRequest();

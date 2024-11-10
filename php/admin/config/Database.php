@@ -2,12 +2,12 @@
 
 require_once __DIR__ . '/env.php';
 
-class Database {
+class AdminDatabase {
     private static $instance = null;
     private $db;
 
     private function __construct() {
-        $dbPath = dirname(__DIR__) . '/' . Environment::get('DB_PATH', 'database.sqlite');
+        $dbPath = dirname(__DIR__) . '/' . Environment::get('DB_PATH', 'admin.sqlite');
         $dbDir = dirname($dbPath);
         
         // Create database directory if it doesn't exist
@@ -30,7 +30,7 @@ class Database {
 
     public static function getInstance() {
         if (self::$instance === null) {
-            self::$instance = new Database();
+            self::$instance = new AdminDatabase();
         }
         return self::$instance;
     }

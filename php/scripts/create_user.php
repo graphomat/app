@@ -5,38 +5,64 @@ class UserManager {
     private $db;
 
     public function __construct() {
-        $this->db = Database::getInstance()->getConnection();
+        $this->db = Database::getInstance();
     }
 
-    public function createUser($username, $password, $generateToken = true) {
+    public function createUser($username, $password, $email = null) {
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-        $token = $generateToken ? bin2hex(random_bytes(32)) : null;
-        $expiry = $generateToken ? date('Y-m-d H:i:s', strtotime('+30 days')) : null;
+        $email = $email ?? $username . '@example.com';
 
         try {
-            $stmt = $this->db->prepare(
-                "INSERT INTO users (username, password_hash, api_token, token_expiry) 
-                 VALUES (:username, :password_hash, :token, :expiry)"
-            );
-            
-            $stmt->bindValue(':username', $username, SQLITE3_TEXT);
-            $stmt->bindValue(':password_hash', $passwordHash, SQLITE3_TEXT);
-            $stmt->bindValue(':token', $token, SQLITE3_TEXT);
-            $stmt->bindValue(':expiry', $expiry, SQLITE3_TEXT);
-            
-            $result = $stmt->execute();
+            // Check if user exists
+            $checkQuery = "SELECT id FROM admin_users WHERE username = :username OR email = :email";
+            $result = $this->db->query($checkQuery, [
+                ':username' => $username,
+                ':email' => $email
+            ]);
 
-            if ($result && $this->db->changes() > 0) {
-                return [
-                    'success' => true,
-                    'username' => $username,
-                    'api_token' => $token,
-                    'expires' => $expiry
-                ];
+            if ($result && $result->fetchArray(SQLITE3_ASSOC)) {
+                // User exists, update password
+                $updateQuery = "UPDATE admin_users SET 
+                    password_hash = :password_hash,
+                    is_active = 1
+                    WHERE username = :username OR email = :email";
+                
+                $stmt = $this->db->query($updateQuery, [
+                    ':username' => $username,
+                    ':email' => $email,
+                    ':password_hash' => $passwordHash
+                ]);
+
+                if ($stmt) {
+                    return [
+                        'success' => true,
+                        'message' => 'User updated',
+                        'username' => $username
+                    ];
+                }
             } else {
-                throw new Exception("Failed to create user");
+                // Create new user
+                $insertQuery = "INSERT INTO admin_users (username, email, password_hash, role, is_active) 
+                              VALUES (:username, :email, :password_hash, 'admin', 1)";
+                
+                $stmt = $this->db->query($insertQuery, [
+                    ':username' => $username,
+                    ':email' => $email,
+                    ':password_hash' => $passwordHash
+                ]);
+
+                if ($stmt) {
+                    return [
+                        'success' => true,
+                        'message' => 'User created',
+                        'username' => $username
+                    ];
+                }
             }
+
+            throw new Exception("Failed to manage user");
         } catch (Exception $e) {
+            error_log("User management error: " . $e->getMessage());
             return [
                 'success' => false,
                 'error' => $e->getMessage()
@@ -44,34 +70,30 @@ class UserManager {
         }
     }
 
-    public function generateToken($username) {
-        $token = bin2hex(random_bytes(32));
-        $expiry = date('Y-m-d H:i:s', strtotime('+30 days'));
+    public function updatePassword($username, $password) {
+        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
         try {
-            $stmt = $this->db->prepare(
-                "UPDATE users 
-                 SET api_token = :token, token_expiry = :expiry 
-                 WHERE username = :username"
-            );
+            $query = "UPDATE admin_users SET 
+                     password_hash = :password_hash 
+                     WHERE username = :username";
             
-            $stmt->bindValue(':token', $token, SQLITE3_TEXT);
-            $stmt->bindValue(':expiry', $expiry, SQLITE3_TEXT);
-            $stmt->bindValue(':username', $username, SQLITE3_TEXT);
-            
-            $result = $stmt->execute();
+            $stmt = $this->db->query($query, [
+                ':username' => $username,
+                ':password_hash' => $passwordHash
+            ]);
 
-            if ($result && $this->db->changes() > 0) {
+            if ($stmt) {
                 return [
                     'success' => true,
-                    'username' => $username,
-                    'api_token' => $token,
-                    'expires' => $expiry
+                    'message' => 'Password updated',
+                    'username' => $username
                 ];
             } else {
-                throw new Exception("User not found or token not updated");
+                throw new Exception("Failed to update password");
             }
         } catch (Exception $e) {
+            error_log("Password update error: " . $e->getMessage());
             return [
                 'success' => false,
                 'error' => $e->getMessage()
@@ -86,12 +108,10 @@ if (php_sapi_name() !== 'cli') {
 }
 
 // Parse command line arguments
-$options = getopt('', ['action:', 'username:', 'password:']);
+$options = getopt('', ['action:', 'username:', 'password:', 'email::']);
 
 if (!isset($options['action'])) {
-    die("Usage: 
-    Create user: php create_user.php --action=create --username=user --password=pass
-    Generate token: php create_user.php --action=token --username=user\n");
+    die("Usage: php create_user.php --action=[create|update] --username=user --password=pass [--email=user@example.com]\n");
 }
 
 $userManager = new UserManager();
@@ -101,26 +121,32 @@ switch ($options['action']) {
         if (!isset($options['username']) || !isset($options['password'])) {
             die("Username and password are required for user creation\n");
         }
-        $result = $userManager->createUser($options['username'], $options['password']);
+        
+        $result = $userManager->createUser(
+            $options['username'], 
+            $options['password'],
+            $options['email'] ?? null
+        );
         break;
 
-    case 'token':
-        if (!isset($options['username'])) {
-            die("Username is required for token generation\n");
+    case 'update':
+        if (!isset($options['username']) || !isset($options['password'])) {
+            die("Username and password are required for password update\n");
         }
-        $result = $userManager->generateToken($options['username']);
+        
+        $result = $userManager->updatePassword(
+            $options['username'], 
+            $options['password']
+        );
         break;
 
     default:
-        die("Invalid action. Use 'create' or 'token'\n");
+        die("Invalid action. Use 'create' or 'update'\n");
 }
 
 if ($result['success']) {
-    echo "Operation successful!\n";
-    if (isset($result['api_token'])) {
-        echo "API Token: " . $result['api_token'] . "\n";
-        echo "Expires: " . $result['expires'] . "\n";
-    }
+    echo $result['message'] . "!\n";
+    echo "Username: " . $result['username'] . "\n";
 } else {
     echo "Error: " . $result['error'] . "\n";
 }

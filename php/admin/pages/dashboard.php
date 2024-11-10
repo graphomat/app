@@ -1,109 +1,44 @@
-<div class="content-header">
-    <h1>Dashboard</h1>
-</div>
+<?php
+require_once __DIR__ . '/../../config/env.php';
+require_once __DIR__ . '/../../config/Database.php';
+require_once __DIR__ . '/../auth.php';
 
-<div class="dashboard-grid">
-    <div class="card">
-        <h3>Quick Stats</h3>
-        <div id="stats-container">Loading...</div>
-    </div>
+// Auth check will exit with 401 if not authenticated
+requireAuth();
 
-    <div class="card">
-        <h3>Recent Updates</h3>
-        <div id="updates-container">Loading...</div>
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        // Fetch stats
-        const stats = await handleApiRequest('stats');
-        const statsContainer = document.getElementById('stats-container');
-        statsContainer.innerHTML = `
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <h4>Pages</h4>
-                    <p>${stats.pages || 0}</p>
-                </div>
-                <div class="stat-item">
-                    <h4>Menu Items</h4>
-                    <p>${stats.menuItems || 0}</p>
-                </div>
-                <div class="stat-item">
-                    <h4>Media Files</h4>
-                    <p>${stats.mediaFiles || 0}</p>
-                </div>
+// Only get user after auth check
+$user = getCurrentUser();
+if (!$user) {
+    http_response_code(401);
+    exit('Unauthorized');
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header>
+            <h1>Admin Dashboard</h1>
+            <div class="user-info">
+                Welcome, <?php echo htmlspecialchars($user['username']); ?>
+                <a href="../logout.php">Logout</a>
             </div>
-        `;
-
-        // Fetch recent updates
-        const updates = await handleApiRequest('updates');
-        const updatesContainer = document.getElementById('updates-container');
-        updatesContainer.innerHTML = `
-            <div class="updates-list">
-                ${updates.map(update => `
-                    <div class="update-item">
-                        <p>${update.description}</p>
-                        <small>${new Date(update.created_at).toLocaleString()}</small>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-    } catch (error) {
-        console.error('Error loading dashboard:', error);
-    }
-});
-</script>
-
-<style>
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.stat-item {
-    text-align: center;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 4px;
-}
-
-.stat-item h4 {
-    color: var(--primary-color);
-    margin-bottom: 5px;
-}
-
-.stat-item p {
-    font-size: 24px;
-    font-weight: bold;
-    color: var(--secondary-color);
-}
-
-.updates-list {
-    margin-top: 15px;
-}
-
-.update-item {
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.update-item:last-child {
-    border-bottom: none;
-}
-
-.update-item small {
-    color: #666;
-    display: block;
-    margin-top: 5px;
-}
-</style>
+        </header>
+        <nav>
+            <a href="dashboard.php" class="active">Dashboard</a>
+            <a href="content.php">Content</a>
+            <a href="menu.php">Menu</a>
+            <a href="seo.php">SEO</a>
+            <a href="media.php">Media</a>
+        </nav>
+        <main>
+            <h2>Dashboard Overview</h2>
+            <!-- Dashboard content here -->
+        </main>
+    </div>
+</body>
+</html>

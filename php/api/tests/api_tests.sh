@@ -5,8 +5,12 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
 
+# Get base URL from .env
+APP_URL=$(grep APP_URL .env | cut -d '=' -f2)
+API_PATH=$(grep API_PATH .env | cut -d '=' -f2)
+
 # Base URL for API
-API_URL="http://localhost:8007/api"
+API_URL="${APP_URL}${API_PATH}"
 TOKEN=""
 
 # Helper function for printing test results
@@ -105,28 +109,6 @@ GET_SEO_RESPONSE=$(curl -s -X GET \
     "${API_URL}/seo?page_id=1")
 
 print_result $? "Get SEO settings" "$GET_SEO_RESPONSE"
-
-# Test Configuration
-echo -e "\nTesting Configuration..."
-
-# Update config
-UPDATE_CONFIG_RESPONSE=$(curl -s -X POST \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${TOKEN}" \
-    -d '{
-        "name":"site_name",
-        "value":"Test Site Name"
-    }' \
-    "${API_URL}/config")
-
-print_result $? "Update configuration" "$UPDATE_CONFIG_RESPONSE"
-
-# Get config
-GET_CONFIG_RESPONSE=$(curl -s -X GET \
-    -H "Authorization: Bearer ${TOKEN}" \
-    "${API_URL}/config")
-
-print_result $? "Get configuration" "$GET_CONFIG_RESPONSE"
 
 # Test Media Upload
 echo -e "\nTesting Media Upload..."

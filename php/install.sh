@@ -14,6 +14,24 @@ if ! command -v php &> /dev/null; then
     exit 1
 fi
 
+# Kill any existing process on port 8007
+echo "Checking for existing processes on port 8007..."
+if command -v lsof >/dev/null 2>&1; then
+    PORT_PID=$(lsof -ti:8007)
+    if [ ! -z "$PORT_PID" ]; then
+        echo "Killing process using port 8007..."
+        kill -9 $PORT_PID
+        sleep 1
+    fi
+else
+    # Fallback to pkill if lsof is not available
+    if pgrep -f "php -S.*:8007" > /dev/null; then
+        echo "Killing existing PHP server on port 8007..."
+        pkill -f "php -S.*:8007"
+        sleep 1
+    fi
+fi
+
 # Create necessary directories if they don't exist
 echo "Creating necessary directories..."
 mkdir -p uploads/images
@@ -39,24 +57,52 @@ if [ ! -f .env ]; then
     fi
 fi
 
-rm database.sqlite
+# Copy admin/.env.example to admin/.env if it doesn't exist
+if [ ! -f admin/.env ]; then
+    echo "Creating admin/.env file..."
+    cp admin/.env.example admin/.env
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}Created admin/.env file${NC}"
+    else
+        echo -e "${RED}Failed to create admin/.env file${NC}"
+        exit 1
+    fi
+fi
 
-# Run the PHP installer
-echo "Running database installation..."
+# Remove existing databases
+rm -f database.sqlite
+rm -f admin/admin.sqlite
+
+# Run the main database installation
+echo "Running main database installation..."
 INSTALL_RESULT=$(php install.php)
 
 # Check if the installation was successful
 if echo "$INSTALL_RESULT" | grep -q '"success":true'; then
-    echo -e "${GREEN}Installation completed successfully!${NC}"
+    echo -e "${GREEN}Main database installation completed successfully!${NC}"
 else
-    echo -e "${RED}Installation failed with errors:${NC}"
+    echo -e "${RED}Main database installation failed with errors:${NC}"
     echo "$INSTALL_RESULT" | php -r 'echo json_decode(file_get_contents("php://stdin"), true)["errors"][0];'
     exit 1
 fi
 
+# Run the admin database installation
+echo "Running admin database installation..."
+ADMIN_INSTALL_RESULT=$(php admin/install.php)
+
+# Check if the admin installation was successful
+if echo "$ADMIN_INSTALL_RESULT" | grep -q '"success":true'; then
+    echo -e "${GREEN}Admin database installation completed successfully!${NC}"
+else
+    echo -e "${RED}Admin database installation failed with errors:${NC}"
+    echo "$ADMIN_INSTALL_RESULT" | php -r 'echo json_decode(file_get_contents("php://stdin"), true)["errors"][0];'
+    exit 1
+fi
+
 # Create admin user if it doesn't exist
-echo "Checking admin user..."
+echo "Creating admin users..."
 php scripts/create_user.php
+php admin/scripts/create_user.php
 
 echo -e "${GREEN}Installation completed!${NC}"
 echo -e "${YELLOW}Please ensure your web server has proper permissions to write to the uploads directory.${NC}"
@@ -65,13 +111,10 @@ echo "Username: admin"
 echo "Password: admin123"
 echo -e "${RED}IMPORTANT: Please change the default password after your first login!${NC}"
 
-
 # Load Variables
 source .env
-PATHH=$(pwd)
-#echo ${PATHH}
-
-
+HOSTNAME=${HOSTNAME:-localhost}
+PORT=${PORT:-8007}
 
 # Local PHP setup
 echo -e "\n${YELLOW}Starting PHP development server...${NC}"

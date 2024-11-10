@@ -13,7 +13,11 @@ class SectionLoader {
     public function getActiveSections() {
         $sections = [];
         $result = $this->db->getConnection()->query(
-            "SELECT name, title FROM sections WHERE is_active = 1 ORDER BY sort_order ASC"
+            "SELECT s.name, s.title 
+             FROM sections s 
+             LEFT JOIN pages p ON s.page_id = p.id 
+             WHERE p.status = 'published' OR p.id IS NULL 
+             ORDER BY s.sort_order ASC"
         );
         
         while ($row = $result->fetchArray(SQLITE3_ASSOC)) {

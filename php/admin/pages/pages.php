@@ -1,6 +1,6 @@
 <?php
-require_once '../auth.php';
-require_once '../header.php';
+require_once dirname(__DIR__) . '/auth.php';
+require_once dirname(__DIR__) . '/header.php';
 ?>
 
 <div class="content-header">
@@ -408,4 +408,4 @@ function editComponent(componentId) {
 }
 </style>
 
-<?php require_once '../footer.php'; ?>
+<?php require_once dirname(__DIR__) . '/footer.php'; ?>
