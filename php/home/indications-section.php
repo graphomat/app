@@ -1,36 +1,15 @@
 <?php
-// indications-section.php
+require_once __DIR__ . '/../config/Database.php';
 
-$dbtIndications = [
-    [
-        'title' => 'Трудности с регуляцией эмоционального состояния',
-        'description' => 'Помощь в управлении эмоциями и развитии навыков эмоциональной регуляции.'
-    ],
-    [
-        'title' => 'Пограничное расстройство личности',
-        'description' => 'Эффективная терапия для людей с ПРЛ, помогающая стабилизировать эмоции и улучшить межличностные отношения.'
-    ],
-    [
-        'title' => 'Биполярное аффективное расстройство (БАР)',
-        'description' => 'Поддержка в управлении симптомами БАР и предотвращении рецидивов.'
-    ],
-    [
-        'title' => 'Расстройства пищевого поведения',
-        'description' => 'Работа над нормализацией пищевого поведения и связанных с ним эмоциональных трудностей.'
-    ],
-    [
-        'title' => 'Синдром дефицита внимания с гиперактивностью (СДВГ)',
-        'description' => 'Развитие навыков концентрации и управления импульсивностью.'
-    ],
-    [
-        'title' => 'Посттравматическое стрессовое расстройство',
-        'description' => 'Помощь в преодолении последствий травмы и развитии устойчивости.'
-    ],
-    [
-        'title' => 'Химические и нехимические зависимости',
-        'description' => 'Работа с зависимым поведением и развитие здоровых копинг-стратегий.'
-    ]
-];
+$db = Database::getInstance();
+$conn = $db->getConnection();
+
+// Fetch DBT indications
+$dbtIndications = [];
+$result = $conn->query("SELECT title, description FROM dbt_indications WHERE is_active = 1 ORDER BY sort_order ASC");
+while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+    $dbtIndications[] = $row;
+}
 ?>
 
 <section class="indications-section" aria-labelledby="indications-heading">

@@ -1,35 +1,41 @@
 <?php
-// about-section.php
+require_once __DIR__ . '/../config/Database.php';
 
-$teamMembers = [
-    'Daria Dymont',
-    'Ekaterina Khisamieva',
-    'Anastasia Nikolaeva',
-    'Alsou Fazullina',
-    'Olga Sapietta',
-    'Liudmila Grishanova'
-];
+$db = Database::getInstance();
+$conn = $db->getConnection();
 
-$certificationDetails = [
-    'institution' => 'Behavioral Tech Institute',
-    'program' => 'DBT Intensive Training',
-    'dates' => [
-        'part1' => 'March 1-3, 2024 & April 5-7, 2024',
-        'part2' => 'September 20-22, 2024 & October 11-13, 2024'
-    ],
-    'instructors' => [
-        'André Ivanoff, PhD',
-        'Dmitry Pushkarev, MD, PhD'
-    ]
-];
+// Fetch team members
+$teamMembers = [];
+$result = $conn->query("SELECT name FROM team_members WHERE is_active = 1 ORDER BY sort_order ASC");
+while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+    $teamMembers[] = $row['name'];
+}
+
+// Fetch certification details
+$result = $conn->query("SELECT * FROM certification_details ORDER BY created_at DESC LIMIT 1");
+$certificationDetails = $result->fetchArray(SQLITE3_ASSOC);
+
+// Fetch certification instructors
+$instructors = [];
+$stmt = $conn->prepare("SELECT name, title FROM certification_instructors WHERE certification_id = ? ORDER BY sort_order ASC");
+$stmt->bindValue(1, $certificationDetails['id'], SQLITE3_INTEGER);
+$result = $stmt->execute();
+while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+    $instructors[] = $row;
+}
 ?>
 
 <section class="about-section" aria-labelledby="about-heading">
     <div class="about-grid">
         <div class="about-content">
             <h2 id="about-heading">O НАС</h2>
-            <p>В 2024 году наша команда прошла обучение диалектической поведенческой терапии от Behavioral Tech под
-                руководством преподавателей: André Ivanoff и Дмитрия Пушкарева.</p>
+            <p>В 2024 году наша команда прошла обучение диалектической поведенческой терапии от <?php echo htmlspecialchars($certificationDetails['institution']); ?> под
+                руководством преподавателей: <?php 
+                $instructorNames = array_map(function($instructor) {
+                    return $instructor['name'] . ($instructor['title'] ? ', ' . $instructor['title'] : '');
+                }, $instructors);
+                echo htmlspecialchars(implode(' и ', $instructorNames)); 
+                ?>.</p>
 
             <div class="certification-details" aria-labelledby="team-heading">
                 <h3 id="team-heading">Наша команда сертифицированных специалистов:</h3>
@@ -42,26 +48,26 @@ $certificationDetails = [
         </div>
 
         <div class="certification-card" aria-labelledby="cert-heading">
-            <a href="Cert_Unity_241108_073542.pdf" aria-label="Посмотреть сертификат Behavioral Tech Institute">
+            <a href="Cert_Unity_241108_073542.pdf" aria-label="Посмотреть сертификат <?php echo htmlspecialchars($certificationDetails['institution']); ?>">
                 <img src="img/unitydbt-cert.png" 
-                     alt="Сертификат DBT Intensive Training от Behavioral Tech Institute" 
+                     alt="Сертификат <?php echo htmlspecialchars($certificationDetails['program']); ?> от <?php echo htmlspecialchars($certificationDetails['institution']); ?>" 
                      class="certification-logo"
                      height="350">
             </a>
 
             <div class="certification-details">
-                <h3 id="cert-heading">DBT Intensive Training</h3>
+                <h3 id="cert-heading"><?php echo htmlspecialchars($certificationDetails['program']); ?></h3>
                 <p>
-                    <span class="highlight-text">Часть 1:</span> <?php echo htmlspecialchars($certificationDetails['dates']['part1']); ?>
+                    <span class="highlight-text">Часть 1:</span> <?php echo htmlspecialchars($certificationDetails['part1_dates']); ?>
                 </p>
                 <p>
-                    <span class="highlight-text">Часть 2:</span> <?php echo htmlspecialchars($certificationDetails['dates']['part2']); ?>
+                    <span class="highlight-text">Часть 2:</span> <?php echo htmlspecialchars($certificationDetails['part2_dates']); ?>
                 </p>
 
                 <h3 id="instructors-heading">Преподаватели:</h3>
                 <div role="list" aria-labelledby="instructors-heading">
-                    <?php foreach ($certificationDetails['instructors'] as $instructor): ?>
-                        <p role="listitem"><?php echo htmlspecialchars($instructor); ?></p>
+                    <?php foreach ($instructors as $instructor): ?>
+                        <p role="listitem"><?php echo htmlspecialchars($instructor['name'] . ($instructor['title'] ? ', ' . $instructor['title'] : '')); ?></p>
                     <?php endforeach; ?>
                 </div>
             </div>

@@ -8,7 +8,12 @@
         <button class="section-btn active" onclick="filterConfig('all')">All Settings</button>
         <button class="section-btn" onclick="filterConfig('general')">General</button>
         <button class="section-btn" onclick="filterConfig('contact')">Contact</button>
-        <button class="section-btn" onclick="filterConfig('social')">Social Media</button>
+        <button class="section-btn" onclick="filterConfig('hero')">Hero Section</button>
+        <button class="section-btn" onclick="filterConfig('team')">Team</button>
+        <button class="section-btn" onclick="filterConfig('certification')">Certification</button>
+        <button class="section-btn" onclick="filterConfig('indications')">Indications</button>
+        <button class="section-btn" onclick="filterConfig('program')">Program</button>
+        <button class="section-btn" onclick="filterConfig('api')">API</button>
         <button class="section-btn" onclick="filterConfig('custom')">Custom</button>
     </div>
 
@@ -58,6 +63,8 @@
                     <option value="url">URL</option>
                     <option value="number">Number</option>
                     <option value="boolean">Boolean</option>
+                    <option value="html">HTML</option>
+                    <option value="svg">SVG</option>
                 </select>
             </div>
             <div class="form-group">
@@ -98,6 +105,8 @@
                     <option value="url">URL</option>
                     <option value="number">Number</option>
                     <option value="boolean">Boolean</option>
+                    <option value="html">HTML</option>
+                    <option value="svg">SVG</option>
                 </select>
             </div>
             <div class="form-group">
@@ -154,10 +163,11 @@ function renderConfig() {
 }
 
 function formatConfigValue(value, type) {
+    if (!value) return '';
     if (type === 'boolean') {
         return value === '1' || value === 'true' ? 'Yes' : 'No';
     }
-    if (type === 'textarea') {
+    if (type === 'textarea' || type === 'html' || type === 'svg') {
         return value.length > 50 ? value.substring(0, 50) + '...' : value;
     }
     return value;
@@ -166,7 +176,12 @@ function formatConfigValue(value, type) {
 function getConfigSection(name) {
     if (name.startsWith('site_') || name.startsWith('app_')) return 'general';
     if (name.startsWith('contact_')) return 'contact';
-    if (name.startsWith('social_')) return 'social';
+    if (name.startsWith('hero_')) return 'hero';
+    if (name.startsWith('team_')) return 'team';
+    if (name.startsWith('cert_')) return 'certification';
+    if (name.startsWith('indication_')) return 'indications';
+    if (name.startsWith('program_')) return 'program';
+    if (name.startsWith('api_')) return 'api';
     return 'custom';
 }
 

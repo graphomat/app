@@ -1,104 +1,95 @@
-<?php include 'header.php'; ?>
+<?php
+require_once __DIR__ . '/config/Database.php';
+
+class SectionLoader {
+    private $db;
+    private $loadedStyles = [];
+    private $loadedScripts = [];
+
+    public function __construct() {
+        $this->db = Database::getInstance();
+    }
+
+    public function getActiveSections() {
+        $sections = [];
+        $result = $this->db->getConnection()->query(
+            "SELECT name, title FROM sections WHERE is_active = 1 ORDER BY sort_order ASC"
+        );
+        
+        while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+            $sections[] = $row;
+        }
+        
+        return $sections;
+    }
+
+    public function loadSection($sectionName) {
+        $sectionPath = __DIR__ . '/sections/' . $sectionName;
+        
+        // Check if section exists
+        if (!is_dir($sectionPath)) {
+            error_log("Section not found: {$sectionName}");
+            return false;
+        }
+
+        // Load section files
+        $this->loadSectionStyle($sectionName);
+        $this->loadSectionHTML($sectionName);
+        $this->registerSectionScript($sectionName);
+        
+        return true;
+    }
+
+    private function loadSectionStyle($sectionName) {
+        $stylePath = "/sections/{$sectionName}/style.css";
+        if (!in_array($stylePath, $this->loadedStyles) && file_exists(__DIR__ . $stylePath)) {
+            $this->loadedStyles[] = $stylePath;
+            echo "<link rel='stylesheet' href='{$stylePath}?v=" . filemtime(__DIR__ . $stylePath) . "'>\n";
+        }
+    }
+
+    private function loadSectionHTML($sectionName) {
+        $htmlPath = __DIR__ . "/sections/{$sectionName}/html.php";
+        if (file_exists($htmlPath)) {
+            include $htmlPath;
+        }
+    }
+
+    private function registerSectionScript($sectionName) {
+        $scriptPath = "/sections/{$sectionName}/script.js";
+        if (!in_array($scriptPath, $this->loadedScripts) && file_exists(__DIR__ . $scriptPath)) {
+            $this->loadedScripts[] = $scriptPath;
+            echo "<script defer src='{$scriptPath}?v=" . filemtime(__DIR__ . $scriptPath) . "'></script>\n";
+        }
+    }
+}
+
+// Initialize section loader
+$sectionLoader = new SectionLoader();
+$activeSections = $sectionLoader->getActiveSections();
+?>
 
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $config['site_name']; ?></title>
+    <title>DBT Unity - Диалектическая поведенческая терапия</title>
     
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="<?php echo $config['site_description']; ?>">
-    <meta name="keywords" content="<?php echo $config['keywords']; ?>">
-    <meta name="author" content="<?php echo $config['author']; ?>">
+    <!-- Base styles -->
+    <link rel="stylesheet" href="/styles.css">
     
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="<?php echo $config['site_name']; ?>">
-    <meta property="og:description" content="<?php echo $config['site_description']; ?>">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://dbt-unity.com">
-    <meta property="og:image" content="https://dbt-unity.com/img/unitydbt-logo.png">
-    
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="<?php echo $config['site_name']; ?>">
-    <meta name="twitter:description" content="<?php echo $config['site_description']; ?>">
-    <meta name="twitter:image" content="https://dbt-unity.com/img/unitydbt-logo.png">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://dbt-unity.com">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="img/favicon.png">
-    
-    <!-- Stylesheet -->
-    <link rel="stylesheet" href="styles.css">
-
-    <!-- Schema.org markup -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "MedicalOrganization",
-        "name": "<?php echo $config['site_name']; ?>",
-        "description": "<?php echo $config['site_description']; ?>",
-        "url": "https://dbt-unity.com",
-        "logo": "https://dbt-unity.com/img/unitydbt-logo.png",
-        "contactPoint": {
-            "@type": "ContactPoint",
-            "telephone": "<?php echo $config['contact_phone']; ?>",
-            "email": "<?php echo $config['contact_email']; ?>",
-            "contactType": "customer service"
-        },
-        "medicalSpecialty": ["Психотерапия", "Диалектическая поведенческая терапия"],
-        "availableService": [
-            {
-                "@type": "MedicalTherapy",
-                "name": "Индивидуальная терапия",
-                "description": "Индивидуальные сессии с личным терапевтом"
-            },
-            {
-                "@type": "MedicalTherapy",
-                "name": "Групповой тренинг",
-                "description": "Групповые занятия по развитию навыков"
-            }
-        ]
-    }
-    </script>
+    <!-- Sections styles will be loaded here -->
 </head>
 <body>
-    <!-- Header with navigation -->
-    <?php include 'menu-section.php'; ?>
-
-    <!-- Main content -->
-    <main>
-        <!-- Hero Section -->
-        <?php include 'home/header-section.php'; ?>
-
-        <!-- About Section -->
-        <?php include 'home/about-section.php'; ?>
-
-        <!-- Indications Section -->
-        <?php include 'home/indications-section.php'; ?>
-
-        <!-- Program Section -->
-        <?php include 'home/program-section.php'; ?>
-    </main>
-
-    <!-- Footer -->
-    <?php include 'footer.php'; ?>
-
-    <!-- Structured data for breadcrumbs -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [{
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Главная",
-            "item": "https://dbt-unity.com"
-        }]
+    <?php
+    // Load each active section
+    foreach ($activeSections as $section) {
+        $sectionLoader->loadSection($section['name']);
     }
-    </script>
+    ?>
+    
+    <!-- Base scripts -->
+    <script src="/js/main.js" defer></script>
 </body>
 </html>

@@ -10,6 +10,16 @@ Stworz aplikacje w dockerfile i docker compose
 stworz testy do strony i panelu administracyjnego
 dodaj kluczowe zmienne i sciezki do .env
 
+Każda sekcja powinna modularna, niezależna, być w formacie html w osobnych plikach dla html, css, js, sql query,  sql scehma, 
+folder powinien mieć nazwe sekcji, np header, footer, menu, itp
+Każdy folder sekcji będzie dynamicznie dodawany do index.php w zależnosci od konfiguracji w SQL, gdzie będzie określone ktora sekcja ma być ładowana i w jakiej kolejności
+
+zaktualizauj install.php i install.sh, gdzie jest generowana baza danych, aktualizuj baze z kazdej sekcji sections/*/schema.sql
+
+NOCODE
+
+Dodaj sekcje kontakt
+
 Dodaj rss
 
 
