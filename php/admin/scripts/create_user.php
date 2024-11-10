@@ -9,6 +9,7 @@ class AdminUserManager {
     }
 
     public function createUser($username, $password, $email = null, $role = 'editor') {
+        error_log("Creating user: $username with role: $role");
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
         $email = $email ?? $username . '@example.com';
 
@@ -18,7 +19,9 @@ class AdminUserManager {
             
             $result = $this->db->getConnection()->prepare($query);
             if (!$result) {
-                throw new Exception($this->db->getConnection()->lastErrorMsg());
+                $error = $this->db->getConnection()->lastErrorMsg();
+                error_log("Failed to prepare statement: $error");
+                throw new Exception($error);
             }
 
             $result->bindValue(':username', $username, SQLITE3_TEXT);
@@ -27,6 +30,15 @@ class AdminUserManager {
             $result->bindValue(':role', $role, SQLITE3_TEXT);
 
             if ($result->execute()) {
+                error_log("User created successfully: $username");
+                // Verify the user was created
+                $verifyQuery = "SELECT * FROM admin_users WHERE username = :username";
+                $verifyStmt = $this->db->getConnection()->prepare($verifyQuery);
+                $verifyStmt->bindValue(':username', $username, SQLITE3_TEXT);
+                $verifyResult = $verifyStmt->execute();
+                $user = $verifyResult->fetchArray(SQLITE3_ASSOC);
+                error_log("Verification result: " . json_encode($user));
+                
                 return [
                     'success' => true,
                     'message' => 'User created successfully',
@@ -34,9 +46,12 @@ class AdminUserManager {
                     'role' => $role
                 ];
             } else {
-                throw new Exception("Failed to create user: " . $this->db->getConnection()->lastErrorMsg());
+                $error = $this->db->getConnection()->lastErrorMsg();
+                error_log("Failed to execute statement: $error");
+                throw new Exception("Failed to create user: $error");
             }
         } catch (Exception $e) {
+            error_log("Error creating user: " . $e->getMessage());
             return [
                 'success' => false,
                 'error' => $e->getMessage()
@@ -49,7 +64,9 @@ class AdminUserManager {
             $query = "SELECT COUNT(*) as count FROM admin_users WHERE username = :username";
             $stmt = $this->db->getConnection()->prepare($query);
             if (!$stmt) {
-                throw new Exception($this->db->getConnection()->lastErrorMsg());
+                $error = $this->db->getConnection()->lastErrorMsg();
+                error_log("Failed to prepare statement: $error");
+                throw new Exception($error);
             }
 
             $stmt->bindValue(':username', $username, SQLITE3_TEXT);
@@ -57,6 +74,7 @@ class AdminUserManager {
             
             if ($result) {
                 $row = $result->fetchArray(SQLITE3_ASSOC);
+                error_log("User exists check for $username: " . ($row['count'] > 0 ? 'true' : 'false'));
                 return $row['count'] > 0;
             }
             return false;
@@ -67,6 +85,7 @@ class AdminUserManager {
     }
 
     public function createDefaultUsers() {
+        error_log("Creating default users...");
         $defaultUsers = [
             ['admin', 'admin123', 'admin@example.com', 'admin'],
             ['editor', 'editor123', 'editor@example.com', 'editor'],
@@ -76,7 +95,10 @@ class AdminUserManager {
         $results = [];
         foreach ($defaultUsers as $user) {
             if (!$this->userExists($user[0])) {
+                error_log("Creating default user: " . $user[0]);
                 $results[] = $this->createUser($user[0], $user[1], $user[2], $user[3]);
+            } else {
+                error_log("Default user already exists: " . $user[0]);
             }
         }
         return $results;
@@ -88,6 +110,7 @@ class AdminUserManager {
             $result = $this->db->getConnection()->query($query);
             if ($result) {
                 $row = $result->fetchArray(SQLITE3_ASSOC);
+                error_log("Total user count: " . $row['count']);
                 return $row['count'];
             }
             return 0;
@@ -110,6 +133,7 @@ $options = getopt('', ['action:', 'username:', 'password:', 'email::', 'role::']
 
 // If no users exist or no action specified, create default users
 if ($userManager->countUsers() === 0 || !isset($options['action'])) {
+    error_log("Creating default users...");
     $results = $userManager->createDefaultUsers();
     foreach ($results as $result) {
         if ($result['success']) {

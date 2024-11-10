@@ -70,7 +70,7 @@ FROM languages l,
 ) t
 WHERE l.code = 'es';
 
--- Example webhook configuration
+-- Example webhook configuration 2
 INSERT OR REPLACE INTO admin_integrations (name, type, config, is_active)
 VALUES (
     'Example Section Updates',

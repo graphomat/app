@@ -4,6 +4,7 @@ composer.lock
 database.sqlite
 diagnostic_errors.json
 .phpunit.result.cache
+.init.sh
 vendor
 .idea
 # Byte-compiled / optimized / DLL files

@@ -14,10 +14,12 @@ CREATE TABLE IF NOT EXISTS admin_users (
 );
 
 -- Example users (passwords will be hashed by create_user.php)
-INSERT OR IGNORE INTO admin_users (username, email, password_hash, role, is_active) VALUES
-('admin', 'admin@example.com', 'to_be_hashed', 'admin', 1),
-('editor', 'editor@example.com', 'to_be_hashed', 'editor', 1),
-('viewer', 'viewer@example.com', 'to_be_hashed', 'viewer', 1);
+INSERT OR IGNORE INTO admin_users ( username, email, password_hash, role, is_active, last_login) VALUES
+( 'admin', 'admin@example.com', '$2y$10$Q2ZAV0yw4yAG/VUshJmIIul9xXnXy6pqgGpZ7.0CP6/u3jfivz/9O', 'admin', 1, null),
+( 'editor', 'editor@example.com', '$2y$10$t7RVFz8uhMUdemoXBfa9KOCk3kin4HjFKplZGeIBPH5spFukr8ucS', 'editor', 1, null),
+( 'viewer', 'viewer@example.com', '$2y$10$BcAOoAvF1jevVLpNL1p5fOL3OOHw4l80pweNQ8e3yGi3mvXPYwg7e', 'viewer', 1, null),
+('olga', 'olga@example.com', '$2y$10$byYKuhx/V3mxoulJ/JezzupwtQialcJ7brZ2jKN3xN9547.XJkAX2', 'admin', 1, null);
+
 
 CREATE TABLE IF NOT EXISTS admin_sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

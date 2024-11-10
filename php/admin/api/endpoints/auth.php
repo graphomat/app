@@ -27,14 +27,23 @@ class Auth {
 
     public function login($username, $password) {
         try {
+            error_log("Login attempt - Username: $username");
+
             if (empty($username) || empty($password)) {
+                error_log("Empty username or password");
                 return ['success' => false, 'message' => 'Invalid credentials'];
             }
 
+            // Debug database connection
+            error_log("Database connection state: " . ($this->db->getConnection() ? "Connected" : "Not connected"));
+
             $query = "SELECT id, username, password_hash FROM admin_users WHERE username = :username AND is_active = 1";
+            error_log("Executing query: $query");
+
             $stmt = $this->db->getConnection()->prepare($query);
             if (!$stmt) {
-                error_log("Database query failed in auth login");
+                $error = $this->db->getConnection()->lastErrorMsg();
+                error_log("Failed to prepare statement: $error");
                 return ['success' => false, 'message' => 'Invalid credentials'];
             }
 
@@ -42,19 +51,32 @@ class Auth {
             $result = $stmt->execute();
             
             if (!$result) {
+                $error = $this->db->getConnection()->lastErrorMsg();
+                error_log("Query execution failed: $error");
                 return ['success' => false, 'message' => 'Invalid credentials'];
             }
 
             $user = $result->fetchArray(SQLITE3_ASSOC);
+            error_log("Query result: " . json_encode($user));
+
             if (!$user) {
+                error_log("No user found with username: $username");
                 return ['success' => false, 'message' => 'Invalid credentials'];
             }
 
-            if (!password_verify($password, $user['password_hash'])) {
+            // Debug password verification
+            error_log("Stored password hash: " . $user['password_hash']);
+            error_log("Verifying password...");
+            $passwordVerified = password_verify($password, $user['password_hash']);
+            error_log("Password verification result: " . ($passwordVerified ? "Success" : "Failed"));
+
+            if (!$passwordVerified) {
+                error_log("Password verification failed for user: $username");
                 return ['success' => false, 'message' => 'Invalid credentials'];
             }
 
             $token = $this->generateToken($user['id'], $user['username']);
+            error_log("Generated token: $token");
             
             // Store token in admin_sessions
             try {
@@ -63,6 +85,7 @@ class Auth {
                 $stmt->bindValue(':user_id', $user['id'], SQLITE3_INTEGER);
                 $stmt->bindValue(':token', $token, SQLITE3_TEXT);
                 $stmt->execute();
+                error_log("Session stored successfully");
             } catch (Exception $e) {
                 error_log("Failed to store session: " . $e->getMessage());
                 // Continue even if session storage fails
@@ -92,7 +115,10 @@ class Auth {
 
         // Parse JSON input
         $json = file_get_contents('php://input');
+        error_log("Received request data: " . $json);
+        
         $data = json_decode($json, true);
+        error_log("Parsed request data: " . json_encode($data));
 
         // Validate request data
         if (!$json || !$data || !isset($data['username']) || !isset($data['password'])) {
@@ -103,6 +129,7 @@ class Auth {
 
         // Attempt login
         $result = $this->login($data['username'], $data['password']);
+        error_log("Login result: " . json_encode($result));
         
         // Set appropriate status code
         if (!$result['success']) {

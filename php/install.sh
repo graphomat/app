@@ -69,39 +69,41 @@ if [ ! -f admin/.env ]; then
     fi
 fi
 
-# Remove existing databases
+source .env
+# USER: Remove existing databases
 rm -f database.sqlite
-rm -f admin/admin.sqlite
-
 # Run the main database installation
 echo "Running main database installation..."
-INSTALL_RESULT=$(php install.php)
-
+INSTALL_RESULT=$(php install.php 2>&1)
 # Check if the installation was successful
 if echo "$INSTALL_RESULT" | grep -q '"success":true'; then
     echo -e "${GREEN}Main database installation completed successfully!${NC}"
 else
     echo -e "${RED}Main database installation failed with errors:${NC}"
-    echo "$INSTALL_RESULT" | php -r 'echo json_decode(file_get_contents("php://stdin"), true)["errors"][0];'
+    echo "$INSTALL_RESULT"
     exit 1
 fi
 
+# ADMIN: Load Variables
+source admin/.env
+rm -f admin/admin.sqlite
+
 # Run the admin database installation
 echo "Running admin database installation..."
-ADMIN_INSTALL_RESULT=$(php admin/install.php)
+ADMIN_INSTALL_RESULT=$(php admin/install.php 2>&1)
 
 # Check if the admin installation was successful
 if echo "$ADMIN_INSTALL_RESULT" | grep -q '"success":true'; then
     echo -e "${GREEN}Admin database installation completed successfully!${NC}"
 else
     echo -e "${RED}Admin database installation failed with errors:${NC}"
-    echo "$ADMIN_INSTALL_RESULT" | php -r 'echo json_decode(file_get_contents("php://stdin"), true)["errors"][0];'
+    echo "$ADMIN_INSTALL_RESULT"
     exit 1
 fi
 
 # Create admin user if it doesn't exist
 echo "Creating admin users..."
-php scripts/create_user.php
+#php scripts/create_user.php
 php admin/scripts/create_user.php
 
 echo -e "${GREEN}Installation completed!${NC}"
@@ -112,7 +114,6 @@ echo "Password: admin123"
 echo -e "${RED}IMPORTANT: Please change the default password after your first login!${NC}"
 
 # Load Variables
-source .env
 HOSTNAME=${HOSTNAME:-localhost}
 PORT=${PORT:-8007}
 

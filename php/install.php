@@ -21,7 +21,7 @@ class Installer {
             $this->executeSchema(__DIR__ . '/schema.sql');
             
             // Load and execute section schemas only
-            $this->loadSectionSchemas();
+//            $this->loadSectionSchemas();
             
             return empty($this->errors);
         } catch (Exception $e) {
@@ -29,6 +29,7 @@ class Installer {
             return false;
         }
     }
+
 
     private function executeSchema($schemaPath) {
         if (!file_exists($schemaPath)) {
