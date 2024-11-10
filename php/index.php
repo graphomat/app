@@ -27,23 +27,8 @@ $config = [
     </style>
 </head>
 <body>
-<!-- Header Section -->
-<header class="header">
-    <nav class="nav-container">
-        <div class="logo">
-            <span style="color: white; font-size: 1.5rem;">DBT Unity</span>
-        </div>
-        <ul class="nav-menu">
-            <li><a href="#about">О НАС</a></li>
-            <li><a href="#training">ТРЕНИНГ НАВЫКОВ</a></li>
-            <li><a href="#specialists">СПЕЦИАЛИСТЫ</a></li>
-            <li><a href="#about-dbt">ЧТО ТАКОЕ ДБТ</a></li>
-            <li><a href="#contacts">КОНТАКТЫ</a></li>
-        </ul>
-    </nav>
-</header>
 
-<?php //include 'includes/menu-section.php'; ?>
+<?php include 'menu-section.php'; ?>
 
 
 <!-- Hero Section -->
@@ -52,22 +37,21 @@ $config = [
 
     <!-- About Section -->
     <!-- Copy content from about-section.php -->
-<!--    --><?php //include 'includes/header.php'; ?>
-    <?php include 'includes/header-section.php'; ?>
-    <?php include 'includes/about-section.php'; ?>
+    <?php //include 'includes/header.php'; ?>
+    <?php include 'home/header-section.php'; ?>
+    <?php include 'home/about-section.php'; ?>
 
     <!-- Indications Section -->
     <!-- Copy content from indications-section.php -->
-    <?php include 'includes/indications-section.php'; ?>
+    <?php include 'home/indications-section.php'; ?>
 
     <!-- Program Section -->
     <!-- Copy content from program-section.php -->
-    <?php include 'includes/program-section.php'; ?>
+    <?php include 'home/program-section.php'; ?>
 </main>
 
 <!-- Footer -->
-<footer class="footer">
-    <!-- Copy content from footer section -->
-</footer>
+<?php include 'footer.php'; ?>
+
 </body>
 </html>
