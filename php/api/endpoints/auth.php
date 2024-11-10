@@ -63,32 +63,3 @@ class Auth {
         }
     }
 }
-
-// Handle API requests
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $auth = new Auth();
-    $data = json_decode(file_get_contents('php://input'), true);
-    
-    if (isset($_GET['action'])) {
-        switch ($_GET['action']) {
-            case 'login':
-                if (isset($data['username']) && isset($data['password'])) {
-                    $result = $auth->login($data['username'], $data['password']);
-                    echo json_encode($result);
-                } else {
-                    echo json_encode(['success' => false, 'message' => 'Missing credentials']);
-                }
-                break;
-                
-            case 'logout':
-                $result = $auth->logout();
-                echo json_encode($result);
-                break;
-                
-            default:
-                echo json_encode(['success' => false, 'message' => 'Invalid action']);
-        }
-    } else {
-        echo json_encode(['success' => false, 'message' => 'No action specified']);
-    }
-}

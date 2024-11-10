@@ -1,36 +1,11 @@
 <?php
-require_once __DIR__ . '/../../config/Database.php';
+require_once __DIR__ . '/../config/Database.php';
 
 class UserManager {
     private $db;
 
     public function __construct() {
-        $this->db = Database::getInstance();
-        $this->ensureTokenFields();
-    }
-
-    private function ensureTokenFields() {
-        // Add api_token and token_expiry columns if they don't exist
-        $this->db->query("
-            BEGIN TRANSACTION;
-            
-            CREATE TABLE IF NOT EXISTS temp_users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT NOT NULL UNIQUE,
-                password_hash TEXT NOT NULL,
-                api_token TEXT,
-                token_expiry DATETIME,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            );
-            
-            INSERT INTO temp_users (id, username, password_hash, created_at)
-            SELECT id, username, password_hash, created_at FROM users;
-            
-            DROP TABLE users;
-            ALTER TABLE temp_users RENAME TO users;
-            
-            COMMIT;
-        ");
+        $this->db = Database::getInstance()->getConnection();
     }
 
     public function createUser($username, $password, $generateToken = true) {
@@ -39,23 +14,28 @@ class UserManager {
         $expiry = $generateToken ? date('Y-m-d H:i:s', strtotime('+30 days')) : null;
 
         try {
-            $this->db->query(
+            $stmt = $this->db->prepare(
                 "INSERT INTO users (username, password_hash, api_token, token_expiry) 
-                 VALUES (:username, :password_hash, :token, :expiry)",
-                [
-                    ':username' => $username,
-                    ':password_hash' => $passwordHash,
-                    ':token' => $token,
-                    ':expiry' => $expiry
-                ]
+                 VALUES (:username, :password_hash, :token, :expiry)"
             );
+            
+            $stmt->bindValue(':username', $username, SQLITE3_TEXT);
+            $stmt->bindValue(':password_hash', $passwordHash, SQLITE3_TEXT);
+            $stmt->bindValue(':token', $token, SQLITE3_TEXT);
+            $stmt->bindValue(':expiry', $expiry, SQLITE3_TEXT);
+            
+            $result = $stmt->execute();
 
-            return [
-                'success' => true,
-                'username' => $username,
-                'api_token' => $token,
-                'expires' => $expiry
-            ];
+            if ($result && $this->db->changes() > 0) {
+                return [
+                    'success' => true,
+                    'username' => $username,
+                    'api_token' => $token,
+                    'expires' => $expiry
+                ];
+            } else {
+                throw new Exception("Failed to create user");
+            }
         } catch (Exception $e) {
             return [
                 'success' => false,
@@ -69,23 +49,28 @@ class UserManager {
         $expiry = date('Y-m-d H:i:s', strtotime('+30 days'));
 
         try {
-            $this->db->query(
+            $stmt = $this->db->prepare(
                 "UPDATE users 
                  SET api_token = :token, token_expiry = :expiry 
-                 WHERE username = :username",
-                [
-                    ':token' => $token,
-                    ':expiry' => $expiry,
-                    ':username' => $username
-                ]
+                 WHERE username = :username"
             );
+            
+            $stmt->bindValue(':token', $token, SQLITE3_TEXT);
+            $stmt->bindValue(':expiry', $expiry, SQLITE3_TEXT);
+            $stmt->bindValue(':username', $username, SQLITE3_TEXT);
+            
+            $result = $stmt->execute();
 
-            return [
-                'success' => true,
-                'username' => $username,
-                'api_token' => $token,
-                'expires' => $expiry
-            ];
+            if ($result && $this->db->changes() > 0) {
+                return [
+                    'success' => true,
+                    'username' => $username,
+                    'api_token' => $token,
+                    'expires' => $expiry
+                ];
+            } else {
+                throw new Exception("User not found or token not updated");
+            }
         } catch (Exception $e) {
             return [
                 'success' => false,

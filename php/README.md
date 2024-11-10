@@ -50,7 +50,7 @@ sudo chmod -R 755 data uploads
 ```
 6. Initialize the database:
 ```bash
-sqlite3 data/database.sqlite < ../schema.sql
+sqlite3 database.sqlite < ../schema.sql
 ```
 7. Build and start containers:
 ```bash

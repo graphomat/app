@@ -9,7 +9,7 @@ services:
       - .:/var/www/html
       - ./data:/var/www/html/data
     env_file:
-      - .env
+      - .env.docker
     environment:
       - APACHE_DOCUMENT_ROOT=/var/www/html
       - APP_ENV=${APP_ENV:-development}

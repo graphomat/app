@@ -1,18 +1,4 @@
-<?php
-// index.php
-session_start();
-
-// Basic configuration
-$config = [
-    'site_name' => 'DBT Unity - Диалектическая поведенческая терапия',
-    'site_description' => 'Комплексная ДБТ терапия в России. Профессиональная помощь в управлении эмоциями, работа с ПРЛ, БАР и другими расстройствами.',
-    'contact_email' => 'info@dbt-unity.com',
-    'contact_phone' => '+1 (234) 567-890',
-    'keywords' => 'ДБТ, диалектическая поведенческая терапия, ПРЛ, пограничное расстройство личности, БАР, управление эмоциями, психотерапия',
-    'author' => 'DBT Unity Team'
-];
-?>
-
+<?php include 'header.php'; ?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>

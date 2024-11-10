@@ -1,5 +1,10 @@
 <?php
 session_start();
+// get current path from file name
+$project_path = dirname(__FILE__);
+//$project_path = "/var/www/html";
+// get current path without leading or trailing slashes
+//$project_path = ltrim(rtrim($project_path, '/'), '/');
 
 // Check if already installed
 if (file_exists('.env') && !isset($_GET['force'])) {
@@ -41,13 +46,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $env_content .= "# Database\n";
         $env_content .= "DB_CONNECTION=sqlite\n";
-        $env_content .= "DB_DATABASE=/var/www/html/data/database.sqlite\n\n";
+        $env_content .= "DB_DATABASE=$project_path/database.sqlite\n\n";
 
         $env_content .= "# Paths\n";
-        $env_content .= "UPLOAD_PATH=/var/www/html/uploads\n";
-        $env_content .= "DOCUMENTS_PATH=/var/www/html/uploads/documents\n";
-        $env_content .= "IMAGES_PATH=/var/www/html/uploads/images\n";
-        $env_content .= "OTHER_PATH=/var/www/html/uploads/other\n\n";
+        $env_content .= "UPLOAD_PATH=$project_path/uploads\n";
+        $env_content .= "DOCUMENTS_PATH=$project_path/uploads/documents\n";
+        $env_content .= "IMAGES_PATH=$project_path/uploads/images\n";
+        $env_content .= "OTHER_PATH=$project_path/uploads/other\n\n";
 
         $env_content .= "# Admin Configuration\n";
         $env_content .= "ADMIN_PATH=/admin\n";
