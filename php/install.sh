@@ -6,108 +6,73 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-#PATHH=/var/www/html
-PATHH=$(pwd)
-#echo ${PATHH}
-HOSTNAME=localhost
-PORT=8007
+echo -e "${YELLOW}Starting installation...${NC}"
 
-
-echo -e "${GREEN}Starting Graphomat installation...${NC}"
-
-# Function to check command status
-check_status() {
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}✓ $1 successful${NC}"
-    else
-        echo -e "${RED}✗ $1 failed${NC}"
-        exit 1
-    fi
-}
-
-# Create necessary directories
-echo -e "\n${YELLOW}Creating necessary directories...${NC}"
-mkdir -p data
-mkdir -p uploads/documents uploads/images uploads/other
-check_status "Directory creation"
-
-# Set permissions
-echo -e "\n${YELLOW}Setting permissions...${NC}"
-chmod -R 755 data uploads
-chmod 777 data # Ensure database directory is writable
-check_status "Permission setup"
-
-# Copy environment file if it doesn't exist
-echo -e "\n${YELLOW}Setting up environment configuration...${NC}"
-if [ ! -f .env ]; then
-    cp .env.example .env
-    check_status "Environment file creation"
-    
-    # Generate random string for APP_KEY
-    RANDOM_KEY=$(openssl rand -base64 32)
-    sed -i "s/APP_KEY=.*/APP_KEY=$RANDOM_KEY/" .env
-    
-    # Update paths for local development
-    sed -i "s|${PATHH}/${DB_PATH}|${DB_PATH}|g" .env
-    sed -i "s|${PATHH}/uploads|uploads|g" .env
-fi
-
-# Load Variables
-source .env
-
-# Initialize database
-echo -e "\n${YELLOW}Initializing database...${NC}"
-if [ -f ${DB_SCHEMA} ]; then
-    if [ ! -f ${DB_PATH} ]; then
-        sqlite3 ${DB_PATH} < ${DB_SCHEMA}
-        check_status "Database initialization"
-        chmod 666 ${DB_PATH} # Ensure database file is writable
-    else
-        echo -e "${RED}Database already exists, skipping initialization${NC}"
-    fi
-else
-    echo -e "${RED}Schema file not found. Please make sure schema.sql exists.${NC}"
+# Check if PHP is installed
+if ! command -v php &> /dev/null; then
+    echo -e "${RED}PHP is not installed. Please install PHP and try again.${NC}"
     exit 1
 fi
 
+# Create necessary directories if they don't exist
+echo "Creating necessary directories..."
+mkdir -p uploads/images
+mkdir -p uploads/documents
+mkdir -p uploads/other
 
-# Security reminder
-echo -e "\n${YELLOW}Post-installation security steps:${NC}"
-echo "1. Set secure values for SESSION_LIFETIME and COOKIE_LIFETIME in .env"
-echo "2. Configure proper mail settings in .env if needed"
-echo "3. Set APP_DEBUG=false in production"
+# Set proper permissions
+echo "Setting permissions..."
+chmod -R 755 .
+chmod -R 777 uploads
+find . -type f -name "*.php" -exec chmod 644 {} \;
+find . -type f -name "*.sh" -exec chmod 755 {} \;
 
-# Default credentials reminder
-echo -e "\n${YELLOW}Default admin credentials:${NC}"
+# Copy .env.example to .env if it doesn't exist
+if [ ! -f .env ]; then
+    echo "Creating .env file..."
+    cp .env.example .env
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}Created .env file${NC}"
+    else
+        echo -e "${RED}Failed to create .env file${NC}"
+        exit 1
+    fi
+fi
+
+# Run the PHP installer
+echo "Running database installation..."
+INSTALL_RESULT=$(php install.php)
+
+# Check if the installation was successful
+if echo "$INSTALL_RESULT" | grep -q '"success":true'; then
+    echo -e "${GREEN}Installation completed successfully!${NC}"
+else
+    echo -e "${RED}Installation failed with errors:${NC}"
+    echo "$INSTALL_RESULT" | php -r 'echo json_decode(file_get_contents("php://stdin"), true)["errors"][0];'
+    exit 1
+fi
+
+# Create admin user if it doesn't exist
+echo "Checking admin user..."
+php scripts/create_user.php
+
+echo -e "${GREEN}Installation completed!${NC}"
+echo -e "${YELLOW}Please ensure your web server has proper permissions to write to the uploads directory.${NC}"
+echo -e "${YELLOW}You can now log in to the admin panel with the default credentials:${NC}"
 echo "Username: admin"
 echo "Password: admin123"
-echo -e "${RED}IMPORTANT: Please change the default admin password immediately!${NC}"
+echo -e "${RED}IMPORTANT: Please change the default password after your first login!${NC}"
 
 
-# Check if Docker is available
-if command -v docker &> /dev/null && command -v docker-compose &> /dev/null; then
-    echo -e "\n${YELLOW}Docker detected. Do you want to use Docker? (y/n)${NC}"
-    read -r use_docker
-    
-    if [[ $use_docker =~ ^[Yy]$ ]]; then
-        # Docker setup
-        echo -e "\n${YELLOW}Building and starting Docker containers...${NC}"
-        docker-compose up -d --build
-        check_status "Docker container setup"
-        
-        echo -e "\n${GREEN}Installation completed successfully!${NC}"
-        echo -e "You can access the application at: http://${HOSTNAME}:${PORT}"
-    else
-        # Local PHP setup
-        echo -e "\n${YELLOW}Starting PHP development server...${NC}"
-        echo -e "You can access the application at: http://${HOSTNAME}:${PORT}"
-        echo -e "Press Ctrl+C to stop the server"
-        php -S ${HOSTNAME}:${PORT}
-    fi
-else
-    # Local PHP setup
-    echo -e "\n${YELLOW}Starting PHP development server...${NC}"
-    echo -e "You can access the application at: http://${HOSTNAME}:${PORT}"
-    echo -e "Press Ctrl+C to stop the server"
-    php -S ${HOSTNAME}:${PORT}
-fi
+# Load Variables
+source .env
+PATHH=$(pwd)
+#echo ${PATHH}
+
+
+
+# Local PHP setup
+echo -e "\n${YELLOW}Starting PHP development server...${NC}"
+echo -e "You can access the application at: http://${HOSTNAME}:${PORT}"
+echo -e "Press Ctrl+C to stop the server"
+php -S ${HOSTNAME}:${PORT}

@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../config/env.php';
 require_once __DIR__ . '/Api.php';
 require_once __DIR__ . '/endpoints/auth.php';
+require_once __DIR__ . '/endpoints/seo.php';
 
 header('Content-Type: application/json');
 
@@ -14,8 +15,10 @@ $endpoint = trim($endpoint, '/');
 // Parse endpoint parts
 $parts = explode('/', $endpoint);
 $resource = $parts[0] ?? '';
+$id = $parts[1] ?? null;
+$action = $parts[2] ?? null;
 
-// Handle authentication separately
+// Handle authentication
 if ($resource === 'auth') {
     $auth = new Auth();
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -41,6 +44,49 @@ if ($resource === 'auth') {
     } else {
         http_response_code(405);
         echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+        exit;
+    }
+}
+
+// Handle SEO endpoints
+if ($resource === 'seo') {
+    try {
+        $seo = new SEO();
+        
+        if ($id === 'global') {
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                echo json_encode($seo->getGlobalSeo());
+                exit;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!$data) {
+                    throw new Exception('Invalid JSON data');
+                }
+                echo json_encode($seo->updateGlobalSeo($data));
+                exit;
+            }
+        } elseif ($id === 'pages') {
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                if ($action) {
+                    echo json_encode($seo->getPageSeo($action));
+                } else {
+                    echo json_encode($seo->getPagesSeo());
+                }
+                exit;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!$data) {
+                    throw new Exception('Invalid JSON data');
+                }
+                echo json_encode($seo->updatePageSeo($action, $data));
+                exit;
+            }
+        }
+        
+        throw new Exception('Invalid SEO endpoint');
+    } catch (Exception $e) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         exit;
     }
 }

@@ -16,6 +16,12 @@ Każdy folder sekcji będzie dynamicznie dodawany do index.php w zależnosci od 
 
 zaktualizauj install.php i install.sh, gdzie jest generowana baza danych, aktualizuj baze z kazdej sekcji sections/*/schema.sql
 
+Dodaj do kazdej sekcji plik admin.php, ktory bedzie ladowany przy ladowaniu panelu administracyjnego na podobnej zasadzie co index.php strony www, w celu edycji danej sekcji na landing page dla admina w pliku sections/index.php
+
+Dodaj sekcję footer,
+Dodaj sekcję menu, categories, tags, article, blog
+Dodaj sekcję sitemap, rss, do wyswietlania mapy strony w xml i rss rozszerzeniem odpowiednim dla danej sekcji z administracją i sql, obie sekcje powinny korzystać z sekcji menu, categories, article, tags
+
 NOCODE
 
 Dodaj sekcje kontakt
