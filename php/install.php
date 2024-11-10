@@ -1,13 +1,16 @@
 <?php
 require_once __DIR__ . '/config/Database.php';
 
-class Installer {
+class Installer
+{
     private $db;
+    private $files = [];
     private $errors = [];
     private $sectionsDir = __DIR__ . '/sections';
     private $installedTables = [];
 
-    public function __construct() {
+    public function __construct()
+    {
         try {
             $this->db = Database::getInstance();
         } catch (Exception $e) {
@@ -15,14 +18,28 @@ class Installer {
         }
     }
 
-    public function install() {
+    public function installData($file)
+    {
         try {
             // Load and execute main schema first
-            $this->executeSchema(__DIR__ . '/schema.sql');
-            
+            $this->executeSchema(__DIR__ . "/" . $file);
+
+            return empty($this->errors);
+        } catch (Exception $e) {
+            $this->errors[] = "Installation error: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    public function installModules($file)
+    {
+        try {
+            // Load and execute main schema first
+//            $this->executeSchema(__DIR__ . "/" . $file);
+
             // Load and execute section schemas only
-//            $this->loadSectionSchemas();
-            
+            $this->loadSectionSchemas();
+
             return empty($this->errors);
         } catch (Exception $e) {
             $this->errors[] = "Installation error: " . $e->getMessage();
@@ -31,7 +48,8 @@ class Installer {
     }
 
 
-    private function executeSchema($schemaPath) {
+    private function executeSchema($schemaPath)
+    {
         if (!file_exists($schemaPath)) {
             throw new Exception("Schema file not found: $schemaPath");
         }
@@ -89,13 +107,14 @@ class Installer {
         }
     }
 
-    private function loadSectionSchemas() {
+    private function loadSectionSchemas()
+    {
         if (!is_dir($this->sectionsDir)) {
             throw new Exception("Sections directory not found");
         }
 
         $sections = array_filter(glob($this->sectionsDir . '/*'), 'is_dir');
-        
+
         foreach ($sections as $sectionDir) {
             // Only process directories that are direct sections (skip integrations)
             if (basename(dirname($sectionDir)) === 'sections') {
@@ -107,18 +126,36 @@ class Installer {
         }
     }
 
-    public function getErrors() {
+    public function getErrors()
+    {
         return $this->errors;
     }
 }
 
 // Run installation
-$installer = new Installer();
-$success = $installer->install();
+$installer1 = new Installer();
+$success1 = $installer1->installData('schema.sql');
+
+$installer2 = new Installer();
+$success2 = $installer2->installModules('schema.sql');
+
+$installer3 = new Installer();
+$success3 = $installer3->installData('index.sql');
+
 
 // Output results
 header('Content-Type: application/json');
-echo json_encode([
-    'success' => $success,
-    'errors' => $installer->getErrors()
-]);
+echo json_encode(
+    [
+        'success' => $success1,
+        'errors' => $installer1->getErrors()
+    ],
+    [
+        'success' => $success2,
+        'errors' => $installer2->getErrors()
+    ],
+    [
+        'success' => $success3,
+        'errors' => $installer3->getErrors()
+    ]
+);

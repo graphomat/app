@@ -69,6 +69,46 @@ if [ ! -f admin/.env ]; then
     fi
 fi
 
+# ADMIN: Load Variables
+source admin/.env
+rm -f admin/admin.sqlite
+
+# Run the admin database installation
+echo "Running admin database installation..."
+ADMIN_INSTALL_RESULT=$(php -d display_errors=1 admin/install.php 2>&1)
+
+# Check if the admin installation was successful by looking for success:true and no error messages
+if echo "$ADMIN_INSTALL_RESULT" | grep -q '"success": *true' && ! echo "$ADMIN_INSTALL_RESULT" | grep -q "PHP Warning\|PHP Notice\|PHP Error"; then
+    echo -e "${GREEN}Admin database installation completed successfully!${NC}"
+    
+    # Create admin user if it doesn't exist
+    echo "Creating admin users..."
+    php admin/scripts/create_user.php
+
+    echo -e "${GREEN}Installation completed!${NC}"
+    echo -e "${YELLOW}Please ensure your web server has proper permissions to write to the uploads directory.${NC}"
+    echo -e "${YELLOW}You can now log in to the admin panel with the default credentials:${NC}"
+    echo "Username: admin"
+    echo "Password: admin123"
+    echo -e "${RED}IMPORTANT: Please change the default password after your first login!${NC}"
+
+    # Load Variables
+    HOSTNAME=${HOSTNAME:-localhost}
+    PORT=${PORT:-8007}
+
+    # Local PHP setup
+    echo -e "\n${YELLOW}Starting PHP development server...${NC}"
+    echo -e "You can access the application at: http://${HOSTNAME}:${PORT}"
+    echo -e "Press Ctrl+C to stop the server"
+    php -S ${HOSTNAME}:${PORT}
+else
+    echo -e "${RED}Admin database installation failed:${NC}"
+    echo "$ADMIN_INSTALL_RESULT"
+    exit 1
+fi
+
+
+
 source .env
 # USER: Remove existing databases
 rm -f database.sqlite
@@ -83,42 +123,3 @@ else
     echo "$INSTALL_RESULT"
     exit 1
 fi
-
-# ADMIN: Load Variables
-source admin/.env
-rm -f admin/admin.sqlite
-
-# Run the admin database installation
-echo "Running admin database installation..."
-ADMIN_INSTALL_RESULT=$(php admin/install.php 2>&1)
-
-# Check if the admin installation was successful
-if echo "$ADMIN_INSTALL_RESULT" | grep -q '"success":true'; then
-    echo -e "${GREEN}Admin database installation completed successfully!${NC}"
-else
-    echo -e "${RED}Admin database installation failed with errors:${NC}"
-    echo "$ADMIN_INSTALL_RESULT"
-    exit 1
-fi
-
-# Create admin user if it doesn't exist
-echo "Creating admin users..."
-#php scripts/create_user.php
-php admin/scripts/create_user.php
-
-echo -e "${GREEN}Installation completed!${NC}"
-echo -e "${YELLOW}Please ensure your web server has proper permissions to write to the uploads directory.${NC}"
-echo -e "${YELLOW}You can now log in to the admin panel with the default credentials:${NC}"
-echo "Username: admin"
-echo "Password: admin123"
-echo -e "${RED}IMPORTANT: Please change the default password after your first login!${NC}"
-
-# Load Variables
-HOSTNAME=${HOSTNAME:-localhost}
-PORT=${PORT:-8007}
-
-# Local PHP setup
-echo -e "\n${YELLOW}Starting PHP development server...${NC}"
-echo -e "You can access the application at: http://${HOSTNAME}:${PORT}"
-echo -e "Press Ctrl+C to stop the server"
-php -S ${HOSTNAME}:${PORT}
