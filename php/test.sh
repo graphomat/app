@@ -22,6 +22,26 @@ check_result() {
     fi
 }
 
+# Function to wait for server
+wait_for_server() {
+    local max_attempts=30
+    local attempt=1
+    local url="$1"
+    
+    echo "Waiting for server to start..."
+    while [ $attempt -le $max_attempts ]; do
+        if curl -s "$url" > /dev/null; then
+            echo "Server is up!"
+            return 0
+        fi
+        echo "Attempt $attempt of $max_attempts..."
+        sleep 1
+        ((attempt++))
+    done
+    echo "Server failed to start"
+    return 1
+}
+
 # Main testing sequence
 echo -e "${BLUE}Starting test suite...${NC}"
 
@@ -35,14 +55,23 @@ print_header "Setting up test environment"
 mkdir -p data uploads/documents uploads/images uploads/other
 check_result $? "Create directories"
 
-# Initialize database
+# Initialize main database
 if [ -f "data/database.sqlite" ]; then
     rm data/database.sqlite
 fi
 
-# Create database and set permissions
+# Create main database and set permissions
 cat schema.sql | sqlite3 data/database.sqlite
 chmod 666 data/database.sqlite
+
+# Initialize admin database
+if [ -f "admin/admin.sqlite" ]; then
+    rm admin/admin.sqlite
+fi
+
+# Create admin database and set permissions
+cat admin/schema.sql | sqlite3 admin/admin.sqlite
+chmod 666 admin/admin.sqlite
 check_result $? "Initialize database"
 
 # Make scripts executable
@@ -51,17 +80,23 @@ check_result $? "Make API tests executable"
 
 # Kill any existing PHP server on port 8007
 pkill -f "php -S localhost:8007" || true
-sleep 1
+sleep 2
 
 # Start PHP development server in background
-php -S localhost:8007 &
+php -S localhost:8007 > /dev/null 2>&1 &
 SERVER_PID=$!
-sleep 2  # Give the server time to start
-check_result $? "Start PHP server"
+
+# Wait for server to be ready
+if wait_for_server "http://localhost:8007"; then
+    check_result 0 "Start PHP server"
+else
+    check_result 1 "Start PHP server"
+    exit 1
+fi
 
 # 2. Create test user
 print_header "Creating Test User"
-php scripts/create_user.php --action=create --username=admin --password=admin123 --email=admin@example.com
+php admin/scripts/create_user.php
 check_result $? "Create test user"
 
 # 3. Run API Tests
@@ -84,8 +119,10 @@ else
 fi
 
 # Cleanup
-kill $SERVER_PID
-wait $SERVER_PID 2>/dev/null
+if [ ! -z "$SERVER_PID" ]; then
+    kill $SERVER_PID
+    wait $SERVER_PID 2>/dev/null || true
+fi
 
 # Final results
 echo -e "\n${BLUE}=== Test Results ===${NC}"

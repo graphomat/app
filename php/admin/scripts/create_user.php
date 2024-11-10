@@ -16,15 +16,17 @@ class AdminUserManager {
             $query = "INSERT INTO admin_users (username, email, password_hash, role, is_active) 
                      VALUES (:username, :email, :password_hash, :role, 1)";
             
-            $stmt = $this->db->query($query, [
-                ':username' => $username,
-                ':email' => $email,
-                ':password_hash' => $passwordHash,
-                ':role' => $role
-            ]);
+            $result = $this->db->getConnection()->prepare($query);
+            if (!$result) {
+                throw new Exception($this->db->getConnection()->lastErrorMsg());
+            }
 
-            // Check if the query was successful
-            if ($stmt) {
+            $result->bindValue(':username', $username, SQLITE3_TEXT);
+            $result->bindValue(':email', $email, SQLITE3_TEXT);
+            $result->bindValue(':password_hash', $passwordHash, SQLITE3_TEXT);
+            $result->bindValue(':role', $role, SQLITE3_TEXT);
+
+            if ($result->execute()) {
                 return [
                     'success' => true,
                     'message' => 'User created successfully',
@@ -32,7 +34,7 @@ class AdminUserManager {
                     'role' => $role
                 ];
             } else {
-                throw new Exception("Failed to create user");
+                throw new Exception("Failed to create user: " . $this->db->getConnection()->lastErrorMsg());
             }
         } catch (Exception $e) {
             return [
@@ -45,13 +47,21 @@ class AdminUserManager {
     public function userExists($username) {
         try {
             $query = "SELECT COUNT(*) as count FROM admin_users WHERE username = :username";
-            $result = $this->db->query($query, [':username' => $username]);
+            $stmt = $this->db->getConnection()->prepare($query);
+            if (!$stmt) {
+                throw new Exception($this->db->getConnection()->lastErrorMsg());
+            }
+
+            $stmt->bindValue(':username', $username, SQLITE3_TEXT);
+            $result = $stmt->execute();
+            
             if ($result) {
                 $row = $result->fetchArray(SQLITE3_ASSOC);
                 return $row['count'] > 0;
             }
             return false;
         } catch (Exception $e) {
+            error_log("Error checking user existence: " . $e->getMessage());
             return false;
         }
     }
@@ -75,13 +85,14 @@ class AdminUserManager {
     public function countUsers() {
         try {
             $query = "SELECT COUNT(*) as count FROM admin_users";
-            $result = $this->db->query($query);
+            $result = $this->db->getConnection()->query($query);
             if ($result) {
                 $row = $result->fetchArray(SQLITE3_ASSOC);
                 return $row['count'];
             }
             return 0;
         } catch (Exception $e) {
+            error_log("Error counting users: " . $e->getMessage());
             return 0;
         }
     }

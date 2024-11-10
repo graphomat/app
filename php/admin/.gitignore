@@ -6,6 +6,7 @@ diagnostic_errors.json
 .phpunit.result.cache
 admin.sqlite-shm
 admin.sqlite-wal
+admin.sqlite
 vendor
 .idea
 # Byte-compiled / optimized / DLL files

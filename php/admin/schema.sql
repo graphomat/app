@@ -83,6 +83,18 @@ CREATE TABLE IF NOT EXISTS admin_integrations (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Example webhook configuration
+INSERT OR IGNORE INTO admin_integrations (name, type, config, is_active) VALUES (
+    'Example Section Updates',
+    'webhook',
+    '{
+        "url": "https://api.example.com/webhooks/content-updates",
+        "events": ["content.created", "content.updated", "content.deleted"],
+        "secret_key": "your-secret-key-here"
+    }',
+    1
+);
+
 -- Activity logging
 CREATE TABLE IF NOT EXISTS admin_activity_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

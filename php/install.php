@@ -20,7 +20,7 @@ class Installer {
             // Load and execute main schema first
             $this->executeSchema(__DIR__ . '/schema.sql');
             
-            // Load and execute section schemas
+            // Load and execute section schemas only
             $this->loadSectionSchemas();
             
             return empty($this->errors);
@@ -96,9 +96,12 @@ class Installer {
         $sections = array_filter(glob($this->sectionsDir . '/*'), 'is_dir');
         
         foreach ($sections as $sectionDir) {
-            $schemaPath = $sectionDir . '/schema.sql';
-            if (file_exists($schemaPath)) {
-                $this->executeSchema($schemaPath);
+            // Only process directories that are direct sections (skip integrations)
+            if (basename(dirname($sectionDir)) === 'sections') {
+                $schemaPath = $sectionDir . '/schema.sql';
+                if (file_exists($schemaPath)) {
+                    $this->executeSchema($schemaPath);
+                }
             }
         }
     }

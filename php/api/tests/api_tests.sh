@@ -3,14 +3,14 @@
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
 NC='\033[0m'
 
 # Get base URL from .env
 APP_URL=$(grep APP_URL .env | cut -d '=' -f2)
-API_PATH=$(grep API_PATH .env | cut -d '=' -f2)
 
 # Base URL for API
-API_URL="${APP_URL}${API_PATH}"
+API_URL="${APP_URL}/admin/api"
 TOKEN=""
 
 # Helper function for printing test results
@@ -23,12 +23,21 @@ print_result() {
     fi
 }
 
+# Debug info
+echo -e "${YELLOW}Debug Info:${NC}"
+echo "API URL: ${API_URL}"
+
 # Test Authentication
-echo "Testing Authentication..."
-AUTH_RESPONSE=$(curl -s -X POST \
+echo -e "\nTesting Authentication..."
+echo -e "${YELLOW}Sending auth request to: ${API_URL}/auth${NC}"
+
+AUTH_RESPONSE=$(curl -v -X POST \
     -H "Content-Type: application/json" \
     -d '{"username":"admin","password":"admin123"}' \
-    "${API_URL}/auth")
+    "${API_URL}/auth" 2>&1)
+
+echo -e "${YELLOW}Raw Response:${NC}"
+echo "$AUTH_RESPONSE"
 
 if [[ $AUTH_RESPONSE == *"token"* ]]; then
     TOKEN=$(echo $AUTH_RESPONSE | grep -o '"token":"[^"]*' | cut -d'"' -f4)

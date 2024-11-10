@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../../admin/config/env.php';
-require_once __DIR__ . '/../../admin/config/Database.php';
+require_once __DIR__ . '/../../config/env.php';
+require_once __DIR__ . '/../../config/Database.php';
 
 class Auth {
     private $db;
@@ -9,8 +9,8 @@ class Auth {
 
     public function __construct() {
         $this->db = AdminDatabase::getInstance();
-        $this->secret_key = getenv('JWT_SECRET') ?: 'default-secret-key-change-in-production';
-        $this->token_lifetime = (int)(getenv('JWT_LIFETIME') ?: 3600);
+        $this->secret_key = AdminEnvironment::get('JWT_SECRET') ?: 'default-secret-key-change-in-production';
+        $this->token_lifetime = (int)(AdminEnvironment::get('JWT_LIFETIME') ?: 3600);
     }
 
     private function generateToken($user_id, $username) {

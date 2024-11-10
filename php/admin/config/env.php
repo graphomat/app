@@ -1,6 +1,6 @@
 <?php
 
-class Environment {
+class AdminEnvironment {
     private static $variables = [];
 
     public static function load($path = null) {
@@ -47,7 +47,7 @@ class Environment {
 
 // Load environment variables
 try {
-    Environment::load();
+    AdminEnvironment::load();
 } catch (Exception $e) {
     error_log('Error loading environment variables: ' . $e->getMessage());
 }

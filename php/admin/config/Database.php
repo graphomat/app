@@ -7,7 +7,7 @@ class AdminDatabase {
     private $db;
 
     private function __construct() {
-        $dbPath = dirname(__DIR__) . '/' . Environment::get('DB_PATH', 'admin.sqlite');
+        $dbPath = dirname(__DIR__) . '/' . AdminEnvironment::get('DB_PATH', 'admin.sqlite');
         $dbDir = dirname($dbPath);
         
         // Create database directory if it doesn't exist
