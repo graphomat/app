@@ -3,6 +3,9 @@ require_once __DIR__ . '/../config/env.php';
 require_once __DIR__ . '/Api.php';
 require_once __DIR__ . '/endpoints/auth.php';
 require_once __DIR__ . '/endpoints/seo.php';
+require_once __DIR__ . '/endpoints/menu.php';
+require_once __DIR__ . '/endpoints/sections.php';
+require_once __DIR__ . '/endpoints/sitemap.php';
 
 header('Content-Type: application/json');
 
@@ -84,6 +87,55 @@ if ($resource === 'seo') {
         }
         
         throw new Exception('Invalid SEO endpoint');
+    } catch (Exception $e) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        exit;
+    }
+}
+
+// Handle Menu endpoints
+if ($resource === 'menu') {
+    try {
+        $menu = new MenuEndpoint();
+        $params = ['id' => $id];
+        $result = $menu->handle($_SERVER['REQUEST_METHOD'], $params);
+        if (is_array($result)) {
+            echo json_encode($result);
+        } else {
+            echo json_encode(['success' => true, 'data' => $result]);
+        }
+        exit;
+    } catch (Exception $e) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        exit;
+    }
+}
+
+// Handle Sections endpoints
+if ($resource === 'sections') {
+    try {
+        $sections = new SectionsEndpoint();
+        $params = ['id' => $id];
+        $result = $sections->handle($_SERVER['REQUEST_METHOD'], $params);
+        echo json_encode(['success' => true, 'data' => $result]);
+        exit;
+    } catch (Exception $e) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        exit;
+    }
+}
+
+// Handle Sitemap endpoints
+if ($resource === 'sitemap') {
+    try {
+        $sitemap = new SitemapEndpoint();
+        $params = ['action' => $id];
+        $result = $sitemap->handle($_SERVER['REQUEST_METHOD'], $params);
+        echo json_encode(['success' => true, 'data' => $result]);
+        exit;
     } catch (Exception $e) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);

@@ -42,9 +42,29 @@ panel administracyjny admin/index.php powinien mieć menu do wyboru component.ph
 Stworz diagnostyke do testowania czy w plikach componentow, sections są błędy, uruchom je i sprawdz i pokaz błędy w panelu administracyjnym oraz w pliku test.php i test.sh w folderze glownym z opcjonalnym parametrem dotyczacym co ma byc testowane
 Dodaj opcję w test.sh do sprawdzania czy sa duplikaty tworzonych tabel i kolumn w scehma.sql głównym i w modułach, komponentach, usuń duplikaty w ./schema.sql  
 
-Dopasuj wyglad panelu administracyjnego aby byl bardziej mobilny i latwiejszy w uzyciu z mozliwoscia tesowania live w okienku obok 
+Dopasuj wyglad panelu administracyjnego aby byl bardziej mobilny i latwiejszy w uzyciu z mozliwoscia tesowania live w okienku obok, zwłasza tutaj: http://localhost:8007/admin/index.php?page=sections
+sprawdz, dlaczego nie sa ladowane elementy, np: GET
+http://localhost:8007/api/sitemap-exclusions
+Status
+400
+Bad Request
+VersionHTTP/1.1
+Transferred210 B (46 B size)
+Referrer Policystrict-origin-when-cross-origin
+DNS ResolutionSystem
 
+GET
+http://localhost:8007/api/sections/program
+Status
+400
+Bad Request
+VersionHTTP/1.1
+Transferred210 B (46 B size)
+Referrer Policystrict-origin-when-cross-origin
+DNS ResolutionSystem
 
+Stworz sekcje Meta, gdzie będą przechowywane metadane m.in. dla SEO i roznego typu dla lepszej rozpoznawalnosci strony w interrnecie i integracji z roznymi aplikacjami i social mediami
+Dodaj przykladowe dane dom sekcji meta w schema.sql na podstawie pliku header.php
 
 Stworz folder na kompletne aplikacje/strony niezalezne moduły typu: blog, RSS, SITEMAP, które korzystaja z danych strony
 przeniesś wcześniej utworzone blog, RSS, SITEMAP
@@ -52,6 +72,8 @@ przeniesś wcześniej utworzone blog, RSS, SITEMAP
 
 Stworz folder na funkcje przetwazrania danych w locie i integracji z frameworkiem/sql, nazwij go odpowiednio i dodaj: shortcode, webhooks, API, ktore bedą integrowały się z sections, pokaż przykłady użycia jak skonfigurowac i uzywac w sekcjach, np przy wyswietlaniu filmu z youtube  oraz translacji treści do innych języków pobieranych z sql
 zaktualizuj panel administracji do tego rozwiazania
+
+
 
 
 

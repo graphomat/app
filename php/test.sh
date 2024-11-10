@@ -6,8 +6,20 @@ show_help() {
     echo "Options:"
     echo "  --components  Test only components"
     echo "  --sections    Test only sections"
+    echo "  --schema      Test for duplicate tables and columns in schema files"
     echo "  --help        Show this help message"
     echo "  (no option)   Test everything"
+    echo ""
+    echo "Description:"
+    echo "  This script runs diagnostic tests on the application:"
+    echo "  - Components: Checks for required files and syntax"
+    echo "  - Sections: Verifies section structure and SQL validity"
+    echo "  - Schema: Detects duplicate table/column definitions"
+    echo ""
+    echo "Examples:"
+    echo "  $0              # Run all tests"
+    echo "  $0 --schema     # Check for schema duplicates"
+    echo "  $0 --sections   # Test only sections"
 }
 
 # Process arguments
@@ -21,6 +33,9 @@ case "$1" in
         ;;
     --sections)
         TEST_TYPE="sections"
+        ;;
+    --schema)
+        TEST_TYPE="schema"
         ;;
     "")
         TEST_TYPE=""

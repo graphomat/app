@@ -8,11 +8,11 @@ class MenuQuery {
         $this->db = Database::getInstance();
     }
 
-    public function getMenuData() {
+    public function getMenuData($adminContext = false) {
         $data = [
             'config' => $this->getConfig(),
-            'items' => $this->getMenuItems(),
-            'categories' => $this->getMenuCategories()
+            'items' => $this->getMenuItems(null, $adminContext),
+            'categories' => $this->getMenuCategories(null, $adminContext)
         ];
         return $data;
     }
@@ -31,17 +31,23 @@ class MenuQuery {
         return $config;
     }
 
-    private function getMenuItems($parentId = null) {
+    private function getMenuItems($parentId = null, $adminContext = false) {
         $items = [];
         $query = "SELECT * FROM menu_items WHERE parent_id " . 
-                 ($parentId === null ? "IS NULL" : "= " . $parentId) . 
-                 " AND is_active = 1 ORDER BY position ASC";
+                 ($parentId === null ? "IS NULL" : "= " . $parentId);
+        
+        // Only filter by is_active if not in admin context
+        if (!$adminContext) {
+            $query .= " AND is_active = 1";
+        }
+        
+        $query .= " ORDER BY position ASC";
         
         $result = $this->db->getConnection()->query($query);
         
         while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
             $item = $row;
-            $children = $this->getMenuItems($row['id']);
+            $children = $this->getMenuItems($row['id'], $adminContext);
             if (!empty($children)) {
                 $item['children'] = $children;
             }
@@ -51,19 +57,23 @@ class MenuQuery {
         return $items;
     }
 
-    private function getMenuCategories($parentId = null) {
+    private function getMenuCategories($parentId = null, $adminContext = false) {
         $categories = [];
-        $query = "SELECT * FROM menu_categories 
-                 WHERE parent_id " . ($parentId === null ? "IS NULL" : "= " . $parentId) . 
-                 " AND is_active = 1 
-                 AND show_in_menu = 1 
-                 ORDER BY menu_position ASC";
+        $query = "SELECT * FROM menu_categories WHERE parent_id " . 
+                 ($parentId === null ? "IS NULL" : "= " . $parentId);
+        
+        // Only filter by is_active and show_in_menu if not in admin context
+        if (!$adminContext) {
+            $query .= " AND is_active = 1 AND show_in_menu = 1";
+        }
+        
+        $query .= " ORDER BY menu_position ASC";
         
         $result = $this->db->getConnection()->query($query);
         
         while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
             $category = $row;
-            $children = $this->getMenuCategories($row['id']);
+            $children = $this->getMenuCategories($row['id'], $adminContext);
             if (!empty($children)) {
                 $category['children'] = $children;
             }
@@ -93,8 +103,8 @@ class MenuQuery {
         $stmt->bindValue(':parent_id', $data['parent_id'], $data['parent_id'] === null ? SQLITE3_NULL : SQLITE3_INTEGER);
         $stmt->bindValue(':position', $data['position'], SQLITE3_INTEGER);
         $stmt->bindValue(':is_active', $data['is_active'], SQLITE3_INTEGER);
-        $stmt->bindValue(':target', $data['target'], SQLITE3_TEXT);
-        $stmt->bindValue(':icon_class', $data['icon_class'], SQLITE3_TEXT);
+        $stmt->bindValue(':target', $data['target'] ?? '_self', SQLITE3_TEXT);
+        $stmt->bindValue(':icon_class', $data['icon_class'] ?? '', SQLITE3_TEXT);
         
         return $stmt->execute();
     }
@@ -111,8 +121,8 @@ class MenuQuery {
         $stmt->bindValue(':parent_id', $data['parent_id'], $data['parent_id'] === null ? SQLITE3_NULL : SQLITE3_INTEGER);
         $stmt->bindValue(':position', $data['position'], SQLITE3_INTEGER);
         $stmt->bindValue(':is_active', $data['is_active'], SQLITE3_INTEGER);
-        $stmt->bindValue(':target', $data['target'], SQLITE3_TEXT);
-        $stmt->bindValue(':icon_class', $data['icon_class'], SQLITE3_TEXT);
+        $stmt->bindValue(':target', $data['target'] ?? '_self', SQLITE3_TEXT);
+        $stmt->bindValue(':icon_class', $data['icon_class'] ?? '', SQLITE3_TEXT);
         
         return $stmt->execute();
     }
