@@ -13,15 +13,3 @@ INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_or
         {"title": "Phone Coaching", "description": "Get support between sessions when needed"},
         {"title": "Therapist Consultation", "description": "Our team meets regularly to provide the best care"}
     ]}');
-
--- Training sections configuration
-INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
-    (3, 'training-intro', 'Тренинг навыков ДБТ', 'Программа обучения навыкам', 'content', 1,
-    '{"content": "Наша программа тренинга навыков ДБТ включает в себя четыре основных модуля, направленных на развитие важных жизненных навыков."}'),
-    (3, 'modules', 'Модули программы', 'Основные компоненты тренинга', 'modules', 2,
-    '{"modules": [
-        {"title": "Осознанность", "description": "Развитие навыков осознанного присутствия в настоящем моменте"},
-        {"title": "Стрессоустойчивость", "description": "Обучение навыкам преодоления кризисных ситуаций"},
-        {"title": "Эмоциональная регуляция", "description": "Развитие навыков управления эмоциями"},
-        {"title": "Межличностная эффективность", "description": "Улучшение навыков общения и построения отношений"}
-    ]}');

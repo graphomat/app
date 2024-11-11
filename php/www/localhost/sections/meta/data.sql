@@ -23,12 +23,3 @@ INSERT INTO meta (
  'DBT Unity - Диалектическая поведенческая терапия',
  'Комплексная ДБТ терапия в России. Профессиональная помощь в управлении эмоциями.',
  'summary');
-
--- Insert pages data
-INSERT OR IGNORE INTO pages (id, site_id, title, slug, status) VALUES
-    (1, 1, 'О нас - Unity DBT', 'home', 'published'),
-    (2, 1, 'О нас - Unity DBT', 'about', 'published'),
-    (3, 1, 'Тренинг навыков - Unity DBT', 'training', 'published'),
-    (4, 1, 'Специалисты - Unity DBT', 'specialists', 'published'),
-    (5, 1, 'Что такое ДБТ - Unity DBT', 'about-dbt', 'published'),
-    (6, 1, 'Контакты - Unity DBT', 'contact', 'published');

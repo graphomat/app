@@ -20,10 +20,6 @@ INSERT INTO certification_instructors (certification_id, name, title, sort_order
     (1, 'André Ivanoff', 'PhD', 1),
     (1, 'Dmitry Pushkarev', 'MD, PhD', 2);
 
--- Certification section configuration
-INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
-    (2, 'certification', 'Сертификация', 'Наши профессиональные достижения', 'certification', 3, '{}');
-
 -- Certification configuration
 INSERT INTO config (name, value, type, description) VALUES
     ('about_cert_image', '/img/unitydbt-cert.png', 'text', 'Certification image path'),

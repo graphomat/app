@@ -63,3 +63,11 @@ INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_or
             "answer": "Да, мы проводим онлайн консультации через защищенные каналы видеосвязи. Эффективность онлайн формата сопоставима с очными встречами."
         }
     ]}', 4);
+
+
+-- Contact sections configuration
+INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
+    (7, 'contact-info', 'Контактная информация', 'Как с нами связаться', 'contact', 1,
+    '{"phone": "+7 (XXX) XXX-XX-XX", "email": "contact@unitydbt.ru", "address": "Адрес клиники"}'),
+    (7, 'contact-form', 'Форма обратной связи', 'Отправьте нам сообщение', 'form', 2, '{}'),
+    (7, 'map', 'Как добраться', 'Схема проезда', 'map', 3, '{"coordinates": "XX.XXXXX,XX.XXXXX"}');

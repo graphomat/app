@@ -1,71 +1,121 @@
--- Get site ID and create training page
-INSERT INTO pages (site_id, title, slug, meta_description, status)
-SELECT 
-    id,
-    'Training | DBT Unity',
-    'training',
-    'DBT Skills Training Program - Learn essential skills for emotional regulation, mindfulness, and interpersonal effectiveness.',
-    'published'
-FROM sites 
-WHERE domain = 'localhost'
-AND NOT EXISTS (
-    SELECT 1 FROM pages WHERE slug = 'training'
-);
+-- Training page configuration
+INSERT OR IGNORE INTO pages (site_id, title, slug, meta_description, meta_keywords, status) VALUES
+    (1, 'Тренинг навыков DBT', 'training',
+    'Программа обучения навыкам DBT. Развитие эмоциональной регуляции, осознанности и межличностной эффективности.',
+    'DBT тренинг, навыки DBT, обучение DBT, групповой тренинг, эмоциональная регуляция',
+    'published');
 
--- Create training-intro section
-INSERT INTO sections (page_id, name, title, description, type, sort_order)
-SELECT 
-    p.id,
-    'training-intro',
-    'DBT Skills Training Program',
-    'Our comprehensive DBT skills training program is designed to help you develop essential skills for managing emotions, improving relationships, and building a life worth living.',
-    'content',
-    0
-FROM pages p
-WHERE p.slug = 'training'
-AND NOT EXISTS (
-    SELECT 1 FROM sections s 
-    JOIN pages p2 ON s.page_id = p2.id 
-    WHERE p2.slug = 'training' AND s.name = 'training-intro'
-);
-
--- Create modules section
-INSERT INTO sections (page_id, name, title, description, type, sort_order, data)
-SELECT 
-    p.id,
-    'modules',
-    'Core Training Modules',
-    'Our DBT skills training program consists of four essential modules that work together to build comprehensive emotional management and interpersonal skills.',
-    'modules',
-    1,
+-- Training page sections configuration
+INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data, position) VALUES
+    (8, 'training-intro', 'Программа обучения навыкам DBT', 
+    'Комплексная программа развития навыков управления эмоциями и построения качественной жизни', 
+    'content', 1,
+    '{"content": "Наша программа обучения навыкам DBT помогает развить essential навыки для управления эмоциями, улучшения отношений и построения жизни, которой вы хотите жить. Программа основана на научно доказанных методах и проводится сертифицированными DBT специалистами."}', 0),
+    
+    (8, 'modules', 'Основные модули обучения', 
+    'Четыре ключевых модуля программы DBT', 
+    'modules', 2,
     '{
         "modules": [
             {
-                "title": "Mindfulness",
-                "description": "Develop skills for staying present in the moment and observing without judgment.",
-                "icon": "/img/mindfulness-icon.svg"
+                "title": "Осознанность",
+                "description": "Развитие навыков присутствия в настоящем моменте и безоценочного наблюдения",
+                "icon": "/img/mindfulness-icon.svg",
+                "duration": "8 недель",
+                "skills": [
+                    "Что наблюдать",
+                    "Как наблюдать",
+                    "Мудрый разум",
+                    "Практики осознанности"
+                ]
             },
             {
-                "title": "Distress Tolerance",
-                "description": "Learn effective techniques for managing crisis situations and emotional pain.",
-                "icon": "/img/stress-icon.svg"
+                "title": "Стрессоустойчивость",
+                "description": "Обучение эффективным техникам управления кризисными ситуациями",
+                "icon": "/img/stress-icon.svg",
+                "duration": "8 недель",
+                "skills": [
+                    "Навыки выживания в кризисе",
+                    "Принятие реальности",
+                    "PLEASE навыки",
+                    "Самоуспокоение"
+                ]
             },
             {
-                "title": "Emotion Regulation",
-                "description": "Master skills for understanding and managing your emotions effectively.",
-                "icon": "/img/emotion-icon.svg"
+                "title": "Эмоциональная регуляция",
+                "description": "Освоение навыков понимания и управления эмоциями",
+                "icon": "/img/emotion-icon.svg",
+                "duration": "8 недель",
+                "skills": [
+                    "Понимание эмоций",
+                    "Изменение эмоций",
+                    "Снижение уязвимости",
+                    "Управление сильными чувствами"
+                ]
             },
             {
-                "title": "Interpersonal Effectiveness",
-                "description": "Improve your relationships through better communication and boundary-setting skills.",
-                "icon": "/img/interpersonal-icon.svg"
+                "title": "Межличностная эффективность",
+                "description": "Улучшение навыков общения и установления границ",
+                "icon": "/img/interpersonal-icon.svg",
+                "duration": "8 недель",
+                "skills": [
+                    "Достижение целей",
+                    "Построение отношений",
+                    "Самоуважение",
+                    "DEAR MAN навыки"
+                ]
             }
         ]
-    }'
-FROM pages p
-WHERE p.slug = 'training'
-AND NOT EXISTS (
-    SELECT 1 FROM sections s 
-    JOIN pages p2 ON s.page_id = p2.id 
-    WHERE p2.slug = 'training' AND s.name = 'modules'
-);
+    }', 1),
+    
+    (8, 'format', 'Формат обучения', 
+    'Как проходит обучение навыкам DBT', 
+    'content', 3,
+    '{"content": "Обучение проходит в малых группах (6-8 человек) под руководством сертифицированных DBT тренеров. Программа включает:
+    
+    - Еженедельные групповые занятия (2,5 часа)
+    - Практические упражнения и ролевые игры
+    - Домашние задания для закрепления навыков
+    - Раздаточные материалы и рабочие тетради
+    - Поддержку в применении навыков
+    
+    Каждый модуль длится 8 недель. Вы можете присоединиться к программе с любого модуля."}', 2),
+    
+    (8, 'schedule', 'Расписание групп', 
+    'Текущее расписание групповых занятий', 
+    'content', 4,
+    '{"content": "Группы проходят в следующих форматах:
+    
+    Утренняя группа:
+    - Вторник и четверг, 10:00 - 12:30
+    
+    Вечерняя группа:
+    - Понедельник и среда, 19:00 - 21:30
+    
+    Группа выходного дня:
+    - Суббота, 11:00 - 16:00 (с перерывом)
+    
+    Онлайн группа:
+    - Вторник и четверг, 19:00 - 21:30"}', 3),
+    
+    (8, 'registration', 'Запись на программу', 
+    'Как присоединиться к программе обучения', 
+    'content', 5,
+    '{"content": "Чтобы присоединиться к программе:
+    
+    1. Запишитесь на бесплатную консультацию
+    - Знакомство с тренером
+    - Обсуждение ваших целей
+    - Выбор подходящей группы
+    
+    2. Пройдите вводное занятие
+    - Знакомство с основами DBT
+    - Правила группы
+    - Организационные вопросы
+    
+    3. Присоединяйтесь к группе
+    - Начните обучение
+    - Получите материалы
+    - Станьте частью сообщества
+    
+    Свяжитесь с нами для записи на консультацию."}', 4);

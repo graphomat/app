@@ -10,10 +10,3 @@ INSERT OR IGNORE INTO team_members (name, position_key, bio_key, photo, credenti
     ('Alsou Fazullina', 'dbt_therapist', 'alsou_bio', '/img/team/alsou.jpg', 'DBT-LBC', '["dbt","group","individual"]', '[]', '[]', 1, 8),
     ('Olga Sapietta', 'dbt_therapist', 'olga_bio', '/img/team/olga.jpg', 'DBT-LBC', '["dbt","assessment","skills"]', '[]', '[]', 1, 9),
     ('Liudmila Grishanova', 'dbt_therapist', 'liudmila_bio', '/img/team/liudmila.jpg', 'DBT-LBC', '["dbt","crisis","emotion"]', '[]', '[]', 1, 10);
-
--- Team sections configuration
-INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
-    (2, 'team', 'Наша команда', 'Познакомьтесь с нашими специалистами', 'team', 2, '{}'),
-    (4, 'specialists-intro', 'Наши специалисты', 'Команда сертифицированных DBT терапевтов', 'content', 1,
-    '{"content": "Все наши специалисты прошли сертификацию по программе DBT Intensive Training и имеют многолетний опыт работы."}'),
-    (4, 'team-full', 'Команда Unity DBT', 'Подробная информация о специалистах', 'team-full', 2, '{}');
