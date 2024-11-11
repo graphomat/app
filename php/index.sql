@@ -1,116 +1,3 @@
--- Insert sample data
--- Default site
-INSERT OR IGNORE INTO sites (id, name, domain) VALUES (1, 'Unity DBT', 'localhost:8007');
-
--- Home page
-INSERT OR IGNORE INTO pages (id, site_id, title, slug, status) VALUES (1, 1, 'Unity DBT - Home', 'home', 'published');
-
--- Meta data for home page
-INSERT OR IGNORE INTO meta (page_id, title, description, keywords) 
-VALUES ('home', 'Unity DBT - Dialectical Behavior Therapy', 'Learn about our comprehensive DBT programs and services', 'DBT, therapy, mental health, mindfulness, emotion regulation');
-
--- Sections for home page
-INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data) VALUES 
-(1, 'hero', 'Welcome to Unity DBT', 'Comprehensive Dialectical Behavior Therapy Programs', 'hero', 1, 
-'{"subtitle": "Evidence-based therapy for better living", "cta_text": "Learn More", "cta_link": "/about"}'),
-
-(1, 'about', 'About Unity DBT', 'Discover our approach to Dialectical Behavior Therapy', 'about', 2,
-'{"content": "Unity DBT provides comprehensive dialectical behavior therapy programs designed to help individuals develop effective coping skills and improve their quality of life.", "image": "/img/about-unity.jpg"}'),
-
-(1, 'indications', 'Who Can Benefit', 'DBT can help with various challenges', 'indications', 3,
-'{"items": [
-    {"title": "Emotion Regulation", "icon": "emotion-icon.svg", "description": "Learn to understand and manage emotions effectively"},
-    {"title": "Mindfulness", "icon": "mindfulness-icon.svg", "description": "Develop present-moment awareness and focus"},
-    {"title": "Interpersonal Skills", "icon": "interpersonal-icon.svg", "description": "Improve relationships and communication"},
-    {"title": "Stress Tolerance", "icon": "stress-icon.svg", "description": "Build resilience and cope with difficult situations"}
-]}'),
-
-(1, 'program', 'Our Programs', 'Comprehensive DBT Training and Support', 'program', 4,
-'{"programs": [
-    {"title": "Individual Therapy", "description": "One-on-one sessions tailored to your needs"},
-    {"title": "Group Skills Training", "description": "Learn and practice DBT skills in a supportive group setting"},
-    {"title": "Phone Coaching", "description": "Get support between sessions when needed"},
-    {"title": "Therapist Consultation", "description": "Our team meets regularly to provide the best care"}
-]}');
-
--- Team members
-INSERT OR IGNORE INTO team_members (name, title, bio, is_active, sort_order) VALUES
-('Dr. Sarah Johnson', 'Clinical Director', 'Dr. Johnson is a licensed psychologist with over 15 years of experience in DBT.', 1, 1),
-('Dr. Michael Chen', 'Lead DBT Therapist', 'Dr. Chen specializes in adolescent DBT and family therapy.', 1, 2),
-('Lisa Rodriguez, LCSW', 'Group Skills Trainer', 'Lisa has extensive experience leading DBT skills training groups.', 1, 3),
-('James Wilson, PhD', 'Research Director', 'Dr. Wilson focuses on treatment outcomes and program development.', 1, 4),
-('Daria Dymont', 'DBT Therapist', NULL, 1, 5),
-('Ekaterina Khisamieva', 'DBT Therapist', NULL, 1, 6),
-('Anastasia Nikolaeva', 'DBT Therapist', NULL, 1, 7),
-('Alsou Fazullina', 'DBT Therapist', NULL, 1, 8),
-('Olga Sapietta', 'DBT Therapist', NULL, 1, 9),
-('Liudmila Grishanova', 'DBT Therapist', NULL, 1, 10);
-
--- Certification details
-INSERT OR IGNORE INTO certification_details (
-    title, 
-    description, 
-    certification_date, 
-    expiry_date, 
-    issuing_body, 
-    certificate_number,
-    institution,
-    program,
-    part1_dates,
-    part2_dates,
-    certificate_file
-) VALUES (
-    'DBT-Linehan Board Certification',
-    'Certified DBT program meeting highest standards of DBT treatment delivery',
-    '2023-01-15',
-    '2026-01-15',
-    'DBT-Linehan Board of Certification',
-    'DBT-2023-1234',
-    'Behavioral Tech Institute',
-    'DBT Intensive Training',
-    'March 1-3, 2024 & April 5-7, 2024',
-    'September 20-22, 2024 & October 11-13, 2024',
-    'Cert_Unity_241108_073542.pdf'
-);
-
--- Certification instructors
-INSERT OR IGNORE INTO certification_instructors (certification_id, name, title, sort_order) VALUES
-(1, 'André Ivanoff', 'PhD', 1),
-(1, 'Dmitry Pushkarev', 'MD, PhD', 2);
-
--- Configuration settings
-INSERT OR IGNORE INTO config (name, value, type, description) VALUES
-('site_name', 'Unity DBT', 'text', 'Website name'),
-('contact_email', 'contact@unitydbt.com', 'email', 'Contact email address'),
-('phone_number', '(555) 123-4567', 'text', 'Contact phone number'),
-('address', '123 Therapy Street, Suite 100, Mental Health City, MH 12345', 'text', 'Physical address'),
-('footer_copyright', '© 2024 DBT Unity. Все права защищены.', 'text', 'Footer copyright text'),
-('footer_description', 'Комплексная ДБТ терапия для эффективного управления эмоциями', 'textarea', 'Footer description'),
-('footer_columns', '3', 'number', 'Number of footer link columns'),
-('footer_logo', 'img/unitydbt-logo.png', 'text', 'Footer logo image path'),
-('menu_logo', 'img/unitydbt-logo.png', 'text', 'Menu logo image path'),
-('menu_logo_alt', 'DBT Unity', 'text', 'Menu logo alt text'),
-('menu_mobile_breakpoint', '768', 'number', 'Mobile menu breakpoint in pixels'),
-('menu_sticky', 'true', 'boolean', 'Enable sticky menu'),
-('menu_show_search', 'true', 'boolean', 'Show search in menu'),
-('menu_cta_text', 'ЗАПИСАТЬСЯ НА ПРИЕМ', 'text', 'Call to action button text'),
-('menu_cta_url', '#contact', 'text', 'Call to action button URL'),
-('about_cert_image', 'img/unitydbt-cert.png', 'text', 'Certification image path'),
-('about_cert_image_alt', 'Сертификат DBT Intensive Training от Behavioral Tech Institute', 'text', 'Certification image alt text');
-
--- Menu items
-INSERT OR IGNORE INTO menu_items (title, url, position, is_active) VALUES
-('О НАС', 'index.php', 1, 1),
-('ТРЕНИНГ НАВЫКОВ', 'training.php', 2, 1),
-('СПЕЦИАЛИСТЫ', 'specialists.php', 3, 1),
-('ЧТО ТАКОЕ ДБТ', 'about-dbt.php', 4, 1),
-('КОНТАКТЫ', 'contact.php', 5, 1);
-
--- Menu categories
-INSERT OR IGNORE INTO menu_categories (name, slug, description, show_in_menu, menu_position) VALUES
-('Блог', 'blog', 'Статьи и новости', 1, 6),
-('Услуги', 'services', 'Наши услуги', 1, 7);
-
 -- Footer links
 INSERT OR IGNORE INTO footer_links (title, url, column_number, sort_order) VALUES
 ('О нас', '/about', 1, 1),
@@ -144,3 +31,207 @@ INSERT OR IGNORE INTO dbt_indications (title, description, sort_order) VALUES
 ('Синдром дефицита внимания с гиперактивностью (СДВГ)', 'Развитие навыков концентрации и управления импульсивностью.', 5),
 ('Посттравматическое стрессовое расстройство', 'Помощь в преодолении последствий травмы и развитии устойчивости.', 6),
 ('Химические и нехимические зависимости', 'Работа с зависимым поведением и развитие здоровых копинг-стратегий.', 7);
+
+-- Insert meta data for home page
+INSERT INTO meta (
+    page_id,
+    title,
+    description,
+    keywords,
+    author,
+    og_title,
+    og_description,
+    twitter_card
+) VALUES (
+             1,
+             'DBT Unity - Диалектическая поведенческая терапия',
+             'Комплексная ДБТ терапия в России. Профессиональная помощь в управлении эмоциями, работа с ПРЛ, БАР и другими расстройствами.',
+             'ДБТ, диалектическая поведенческая терапия, ПРЛ, пограничное расстройство личности, БАР, управление эмоциями, психотерапия',
+             'DBT Unity Team',
+             'DBT Unity - Диалектическая поведенческая терапия',
+             'Комплексная ДБТ терапия в России. Профессиональная помощь в управлении эмоциями.',
+             'summary'
+         );
+
+-- Insert meta data for home page
+INSERT INTO meta (
+    page_id,
+    title,
+    description,
+    keywords,
+    author,
+    og_title,
+    og_description,
+    twitter_card
+) VALUES (
+             2,
+             'DBT Unity - Диалектическая поведенческая терапия',
+             'Комплексная ДБТ терапия в России. Профессиональная помощь в управлении эмоциями, работа с ПРЛ, БАР и другими расстройствами.',
+             'ДБТ, диалектическая поведенческая терапия, ПРЛ, пограничное расстройство личности, БАР, управление эмоциями, психотерапия',
+             'DBT Unity Team',
+             'DBT Unity - Диалектическая поведенческая терапия',
+             'Комплексная ДБТ терапия в России. Профессиональная помощь в управлении эмоциями.',
+             'summary'
+         );
+
+INSERT OR IGNORE INTO pages (id, site_id, title, slug, status) VALUES
+    (1, 1, 'О нас - Unity DBT', 'home', 'published'),
+    (2, 1, 'О нас - Unity DBT', 'about', 'published'),
+    (3, 1, 'Тренинг навыков - Unity DBT', 'training', 'published'),
+    (4, 1, 'Специалисты - Unity DBT', 'specialists', 'published'),
+    (5, 1, 'Что такое ДБТ - Unity DBT', 'about-dbt', 'published'),
+    (6, 1, 'Контакты - Unity DBT', 'contact', 'published');
+
+-- Common sections for all pages (menu and footer)
+INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
+-- Home page common sections
+    (1, 'menu', 'Main Menu', 'Navigation menu', 'menu', 0,
+    '{"logo": "/img/unitydbt-logo.png", "logo_alt": "Unity DBT", "show_search": true, "sticky": true, "mobile_breakpoint": 768, "cta_text": "ЗАПИСАТЬСЯ НА ПРИЕМ", "cta_url": "#contact"}'),
+    (1, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}'),
+
+-- About page common sections
+    (2, 'menu', 'Main Menu', 'Navigation menu', 'menu', 0,
+    '{"logo": "/img/unitydbt-logo.png", "logo_alt": "Unity DBT", "show_search": true, "sticky": true, "mobile_breakpoint": 768, "cta_text": "ЗАПИСАТЬСЯ НА ПРИЕМ", "cta_url": "#contact"}'),
+    (2, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}'),
+
+-- Training page common sections
+    (3, 'menu', 'Main Menu', 'Navigation menu', 'menu', 0,
+    '{"logo": "/img/unitydbt-logo.png", "logo_alt": "Unity DBT", "show_search": true, "sticky": true, "mobile_breakpoint": 768, "cta_text": "ЗАПИСАТЬСЯ НА ПРИЕМ", "cta_url": "#contact"}'),
+    (3, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}'),
+
+-- Specialists page common sections
+    (4, 'menu', 'Main Menu', 'Navigation menu', 'menu', 0,
+    '{"logo": "/img/unitydbt-logo.png", "logo_alt": "Unity DBT", "show_search": true, "sticky": true, "mobile_breakpoint": 768, "cta_text": "ЗАПИСАТЬСЯ НА ПРИЕМ", "cta_url": "#contact"}'),
+    (4, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}'),
+
+-- About DBT page common sections
+    (5, 'menu', 'Main Menu', 'Navigation menu', 'menu', 0,
+    '{"logo": "/img/unitydbt-logo.png", "logo_alt": "Unity DBT", "show_search": true, "sticky": true, "mobile_breakpoint": 768, "cta_text": "ЗАПИСАТЬСЯ НА ПРИЕМ", "cta_url": "#contact"}'),
+    (5, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}'),
+
+-- Contact page common sections
+    (6, 'menu', 'Main Menu', 'Navigation menu', 'menu', 0,
+    '{"logo": "/img/unitydbt-logo.png", "logo_alt": "Unity DBT", "show_search": true, "sticky": true, "mobile_breakpoint": 768, "cta_text": "ЗАПИСАТЬСЯ НА ПРИЕМ", "cta_url": "#contact"}'),
+    (6, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}');
+
+-- Sections for home page
+INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
+    (1, 'hero', 'Welcome to Unity DBT', 'Comprehensive Dialectical Behavior Therapy Programs', 'hero', 1,
+    '{"subtitle": "Evidence-based therapy for better living", "cta_text": "Learn More", "cta_link": "/about"}'),
+
+    (1, 'about', 'About Unity DBT', 'Discover our approach to Dialectical Behavior Therapy', 'about', 2,
+    '{"content": "Unity DBT provides comprehensive dialectical behavior therapy programs designed to help individuals develop effective coping skills and improve their quality of life.", "image": "/img/about-unity.jpg"}'),
+
+    (1, 'indications', 'Who Can Benefit', 'DBT can help with various challenges', 'indications', 3,
+    '{"items": [
+        {"title": "Emotion Regulation", "icon": "emotion-icon.svg", "description": "Learn to understand and manage emotions effectively"},
+        {"title": "Mindfulness", "icon": "mindfulness-icon.svg", "description": "Develop present-moment awareness and focus"},
+        {"title": "Interpersonal Skills", "icon": "interpersonal-icon.svg", "description": "Improve relationships and communication"},
+        {"title": "Stress Tolerance", "icon": "stress-icon.svg", "description": "Build resilience and cope with difficult situations"}
+    ]}'),
+
+    (1, 'program', 'Our Programs', 'Comprehensive DBT Training and Support', 'program', 4,
+    '{"programs": [
+        {"title": "Individual Therapy", "description": "One-on-one sessions tailored to your needs"},
+        {"title": "Group Skills Training", "description": "Learn and practice DBT skills in a supportive group setting"},
+        {"title": "Phone Coaching", "description": "Get support between sessions when needed"},
+        {"title": "Therapist Consultation", "description": "Our team meets regularly to provide the best care"}
+    ]}');
+
+-- Sections for about page
+INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
+    (2, 'about-intro', 'О Unity DBT', 'Наш подход к диалектической поведенческой терапии', 'content', 1,
+    '{"content": "Unity DBT - это команда сертифицированных специалистов, предоставляющих комплексную программу диалектической поведенческой терапии.", "image": "/img/about-team.jpg"}'),
+    (2, 'team', 'Наша команда', 'Познакомьтесь с нашими специалистами', 'team', 2, '{}'),
+    (2, 'certification', 'Сертификация', 'Наши профессиональные достижения', 'certification', 3, '{}');
+
+-- Sections for training page
+INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
+    (3, 'training-intro', 'Тренинг навыков ДБТ', 'Программа обучения навыкам', 'content', 1,
+    '{"content": "Наша программа тренинга навыков ДБТ включает в себя четыре основных модуля, направленных на развитие важных жизненных навыков."}'),
+    (3, 'modules', 'Модули программы', 'Основные компоненты тренинга', 'modules', 2,
+    '{"modules": [
+        {"title": "Осознанность", "description": "Развитие навыков осознанного присутствия в настоящем моменте"},
+        {"title": "Стрессоустойчивость", "description": "Обучение навыкам преодоления кризисных ситуаций"},
+        {"title": "Эмоциональная регуляция", "description": "Развитие навыков управления эмоциями"},
+        {"title": "Межличностная эффективность", "description": "Улучшение навыков общения и построения отношений"}
+    ]}');
+
+-- Sections for specialists page
+INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
+    (4, 'specialists-intro', 'Наши специалисты', 'Команда сертифицированных DBT терапевтов', 'content', 1,
+    '{"content": "Все наши специалисты прошли сертификацию по программе DBT Intensive Training и имеют многолетний опыт работы."}'),
+    (4, 'team-full', 'Команда Unity DBT', 'Подробная информация о специалистах', 'team-full', 2, '{}');
+
+-- Sections for about-dbt page
+INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
+    (5, 'dbt-intro', 'Что такое ДБТ?', 'Основы диалектической поведенческой терапии', 'content', 1,
+    '{"content": "Диалектическая поведенческая терапия (ДБТ) - это научно доказанный метод психотерапии, разработанный Маршей Линехан."}'),
+    (5, 'dbt-principles', 'Принципы ДБТ', 'Основные принципы терапии', 'principles', 2,
+    '{"principles": [
+        {"title": "Диалектика", "description": "Баланс между принятием и изменением"},
+        {"title": "Осознанность", "description": "Развитие навыков присутствия в настоящем моменте"},
+        {"title": "Валидация", "description": "Признание и подтверждение опыта клиента"},
+        {"title": "Поведенческий анализ", "description": "Изучение и изменение проблемного поведения"}
+    ]}');
+
+-- Sections for contact page
+INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
+    (6, 'contact-info', 'Контактная информация', 'Как с нами связаться', 'contact', 1,
+    '{"phone": "+7 (XXX) XXX-XX-XX", "email": "contact@unitydbt.ru", "address": "Адрес клиники"}'),
+    (6, 'contact-form', 'Форма обратной связи', 'Отправьте нам сообщение', 'form', 2, '{}'),
+    (6, 'map', 'Как добраться', 'Схема проезда', 'map', 3, '{"coordinates": "XX.XXXXX,XX.XXXXX"}');
+
+-- Team members
+INSERT OR IGNORE INTO team_members (name, position_key, bio_key, photo, credentials, specialties, education, publications, is_active, display_order) VALUES
+    ('Dr. Sarah Johnson', 'clinical_director', 'sarah_bio', '/img/team/sarah.jpg', 'PhD, Licensed Psychologist', '["dbt","cbt","trauma"]', '[{"degree": "PhD in Clinical Psychology", "institution": "Stanford University"}]', '[]', 1, 1),
+    ('Dr. Michael Chen', 'lead_therapist', 'michael_bio', '/img/team/michael.jpg', 'PsyD, DBT-LBC', '["dbt","adolescent","family"]', '[{"degree": "PsyD in Psychology", "institution": "UCLA"}]', '[]', 1, 2),
+    ('Lisa Rodriguez', 'skills_trainer', 'lisa_bio', '/img/team/lisa.jpg', 'LCSW, DBT-LBC', '["dbt","group","mindfulness"]', '[{"degree": "MSW", "institution": "Columbia University"}]', '[]', 1, 3),
+    ('James Wilson', 'research_director', 'james_bio', '/img/team/james.jpg', 'PhD, Research Psychologist', '["research","assessment","outcomes"]', '[{"degree": "PhD in Psychology", "institution": "Harvard University"}]', '[]', 1, 4),
+    ('Daria Dymont', 'dbt_therapist', 'daria_bio', '/img/team/daria.jpg', 'DBT-LBC', '["dbt","individual","crisis"]', '[]', '[]', 1, 5),
+    ('Ekaterina Khisamieva', 'dbt_therapist', 'ekaterina_bio', '/img/team/ekaterina.jpg', 'DBT-LBC', '["dbt","mindfulness","skills"]', '[]', '[]', 1, 6),
+    ('Anastasia Nikolaeva', 'dbt_therapist', 'anastasia_bio', '/img/team/anastasia.jpg', 'DBT-LBC', '["dbt","trauma","emotion"]', '[]', '[]', 1, 7),
+    ('Alsou Fazullina', 'dbt_therapist', 'alsou_bio', '/img/team/alsou.jpg', 'DBT-LBC', '["dbt","group","individual"]', '[]', '[]', 1, 8),
+    ('Olga Sapietta', 'dbt_therapist', 'olga_bio', '/img/team/olga.jpg', 'DBT-LBC', '["dbt","assessment","skills"]', '[]', '[]', 1, 9),
+    ('Liudmila Grishanova', 'dbt_therapist', 'liudmila_bio', '/img/team/liudmila.jpg', 'DBT-LBC', '["dbt","crisis","emotion"]', '[]', '[]', 1, 10);
+
+-- Certification details
+INSERT OR IGNORE INTO certification_details (
+    title,
+    description,
+    certification_date,
+    expiry_date,
+    issuing_body,
+    certificate_number
+) VALUES (
+    'DBT-Linehan Board Certification',
+    'Certified DBT program meeting highest standards of DBT treatment delivery',
+    '2023-01-15',
+    '2026-01-15',
+    'DBT-Linehan Board of Certification',
+    'DBT-2023-1234'
+);
+
+-- Certification instructors
+INSERT INTO certification_instructors (certification_id, name, title, sort_order) VALUES
+    (1, 'André Ivanoff', 'PhD', 1),
+    (1, 'Dmitry Pushkarev', 'MD, PhD', 2);
+
+-- Configuration settings
+INSERT INTO config (name, value, type, description) VALUES
+    ('site_name', 'Unity DBT', 'text', 'Website name'),
+    ('contact_email', 'contact@unitydbt.com', 'email', 'Contact email address'),
+    ('phone_number', '(555) 123-4567', 'text', 'Contact phone number'),
+    ('address', '123 Therapy Street, Suite 100, Mental Health City, MH 12345', 'text', 'Physical address'),
+    ('footer_copyright', '© 2024 DBT Unity. Все права защищены.', 'text', 'Footer copyright text'),
+    ('footer_description', 'Комплексная ДБТ терапия для эффективного управления эмоциями', 'textarea', 'Footer description'),
+    ('footer_columns', '3', 'number', 'Number of footer link columns'),
+    ('footer_logo', 'img/unitydbt-logo.png', 'text', 'Footer logo image path'),
+    ('menu_logo', 'img/unitydbt-logo.png', 'text', 'Menu logo image path'),
+    ('menu_logo_alt', 'DBT Unity', 'text', 'Menu logo alt text'),
+    ('menu_mobile_breakpoint', '768', 'number', 'Mobile menu breakpoint in pixels'),
+    ('menu_sticky', 'true', 'boolean', 'Enable sticky menu'),
+    ('menu_show_search', 'true', 'boolean', 'Show search in menu'),
+    ('menu_cta_text', 'ЗАПИСАТЬСЯ НА ПРИЕМ', 'text', 'Call to action button text'),
+    ('menu_cta_url', '#contact', 'text', 'Call to action button URL'),
+    ('about_cert_image',

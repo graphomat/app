@@ -67,8 +67,8 @@ function renderCategoryMenuItem($category) {
     <div class="header-container">
         <!-- Logo -->
         <a href="/" class="site-logo">
-            <img src="<?php echo htmlspecialchars($data['config']['logo']); ?>" 
-                 alt="<?php echo htmlspecialchars($data['config']['logo_alt']); ?>"
+            <img src="<?php echo htmlspecialchars($data['config']['logo'] ?? '/img/unitydbt-logo.png'); ?>" 
+                 alt="<?php echo htmlspecialchars($data['config']['logo_alt'] ?? 'Unity DBT'); ?>"
                  width="150" height="50">
         </a>
 
@@ -93,7 +93,7 @@ function renderCategoryMenuItem($category) {
                 ?>
             </ul>
 
-            <?php if ($data['config']['show_search'] === 'true'): ?>
+            <?php if ($data['config']['show_search'] ?? false): ?>
                 <!-- Search -->
                 <div class="search-container">
                     <button class="search-toggle" aria-label="Toggle search">
@@ -136,7 +136,7 @@ function renderCategoryMenuItem($category) {
         </nav>
     </div>
 
-    <?php if ($data['config']['show_search'] === 'true'): ?>
+    <?php if ($data['config']['show_search'] ?? false): ?>
         <!-- Mobile Search -->
         <div class="mobile-search">
             <form class="search-form" action="/search" method="get">

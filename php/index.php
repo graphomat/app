@@ -1,30 +1,23 @@
 <?php
+require_once __DIR__ . '/config/env.php';
+require_once __DIR__ . '/config/Logger.php';
 require_once __DIR__ . '/config/Database.php';
 
-class SectionLoader {
+class PageLoader {
+    private $logger;
     private $db;
     private $loadedStyles = [];
     private $loadedScripts = [];
 
     public function __construct() {
-        $this->db = Database::getInstance();
-    }
-
-    public function getActiveSections() {
-        $sections = [];
-        $result = $this->db->getConnection()->query(
-            "SELECT s.name, s.title 
-             FROM sections s 
-             LEFT JOIN pages p ON s.page_id = p.id 
-             WHERE p.status = 'published' OR p.id IS NULL 
-             ORDER BY s.sort_order ASC"
-        );
+        $this->logger = Logger::getInstance();
+        $this->logger->log("Request started: " . $_SERVER['REQUEST_URI']);
         
-        while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-            $sections[] = $row;
+        // Initialize database
+        if (!getenv('DB_PATH')) {
+            throw new Exception('DB_PATH environment variable is not set');
         }
-        
-        return $sections;
+        $this->db = Database::getInstance();
     }
 
     public function loadSection($sectionName) {
@@ -32,7 +25,7 @@ class SectionLoader {
         
         // Check if section exists
         if (!is_dir($sectionPath)) {
-            error_log("Section not found: {$sectionName}");
+            $this->logger->log("Section not found: {$sectionName}", "ERROR");
             return false;
         }
 
@@ -66,34 +59,87 @@ class SectionLoader {
             echo "<script defer src='{$scriptPath}?v=" . filemtime(__DIR__ . $scriptPath) . "'></script>\n";
         }
     }
+
+    public function run() {
+        try {
+            // Get current page from URL
+            $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+            $page = trim($uri, '/');
+            if (empty($page)) {
+                $page = 'home';
+            }
+            
+            $this->logger->log("Loading page: $page");
+            
+            // Get page data
+            $pageData = $this->db->query(
+                "SELECT * FROM pages WHERE slug = :slug AND status = 'published'",
+                ['slug' => $page]
+            );
+            
+            if (empty($pageData)) {
+                $this->logger->log("Page not found: $page", "ERROR");
+                header("HTTP/1.0 404 Not Found");
+                include __DIR__ . '/404.php';
+                exit;
+            }
+            
+            $pageId = $pageData[0]['id'];
+            $this->logger->log("Page found, ID: $pageId");
+            
+            // Get page meta data
+            $metaData = $this->db->query(
+                "SELECT * FROM meta WHERE page_id = :page_id",
+                ['page_id' => $pageId]
+            );
+            $this->logger->log("Meta data loaded");
+            
+            // Get page sections
+            $sections = $this->db->query(
+                "SELECT * FROM sections WHERE page_id = :page_id ORDER BY sort_order ASC",
+                ['page_id' => $pageId]
+            );
+            $this->logger->log("Loaded " . count($sections) . " sections");
+            
+            // Start output buffering
+            ob_start();
+            
+            // Include header
+            include __DIR__ . '/header.php';
+            
+            // Render each section
+            foreach ($sections as $section) {
+                try {
+                    $this->logger->log("Rendering section: " . $section['name']);
+                    $this->loadSection($section['name']);
+                } catch (Exception $e) {
+                    $this->logger->logError("Error rendering section: " . $section['name'], $e);
+                }
+            }
+            
+            // Include footer
+            include __DIR__ . '/footer.php';
+            
+            // Send output
+            ob_end_flush();
+            
+            $this->logger->log("Page rendered successfully");
+            
+        } catch (Exception $e) {
+            $this->logger->logError("Fatal error", $e);
+            
+            // Clear any output
+            if (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+            
+            // Show error page
+            header("HTTP/1.0 500 Internal Server Error");
+            include __DIR__ . '/500.php';
+        }
+    }
 }
 
-// Initialize section loader
-$sectionLoader = new SectionLoader();
-$activeSections = $sectionLoader->getActiveSections();
-?>
-
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DBT Unity - Диалектическая поведенческая терапия</title>
-    
-    <!-- Base styles -->
-    <link rel="stylesheet" href="/styles.css">
-    
-    <!-- Sections styles will be loaded here -->
-</head>
-<body>
-    <?php
-    // Load each active section
-    foreach ($activeSections as $section) {
-        $sectionLoader->loadSection($section['name']);
-    }
-    ?>
-    
-    <!-- Base scripts -->
-    <script src="/js/main.js" defer></script>
-</body>
-</html>
+// Initialize and run the page loader
+$pageLoader = new PageLoader();
+$pageLoader->run();

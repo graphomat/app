@@ -1,5 +1,5 @@
 -- Program components table schema
-CREATE TABLE program_components (
+CREATE TABLE IF NOT EXISTS program_components (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     description TEXT,

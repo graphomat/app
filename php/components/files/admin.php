@@ -22,26 +22,27 @@ class FilesAdmin {
 
     public function getFiles($category = null) {
         $query = "SELECT * FROM files";
+        $params = [];
         if ($category) {
-            $query .= " WHERE category = ?";
-            return $this->db->query($query, [$category]);
+            $query .= " WHERE category = :category";
+            $params[':category'] = $category;
         }
-        return $this->db->query($query);
+        return $this->db->query($query, $params);
     }
 
     public function deleteFile($id) {
         // Get file info first
-        $query = "SELECT file_path FROM files WHERE id = ?";
-        $result = $this->db->query($query, [$id]);
-        $file = $result->fetchArray(SQLITE3_ASSOC);
+        $query = "SELECT file_path FROM files WHERE id = :id";
+        $result = $this->db->query($query, [':id' => $id]);
+        $file = $result[0] ?? null;
         
         if ($file && file_exists($file['file_path'])) {
             unlink($file['file_path']); // Delete physical file
         }
         
         // Delete database record
-        $query = "DELETE FROM files WHERE id = ?";
-        return $this->db->query($query, [$id]);
+        $query = "DELETE FROM files WHERE id = :id";
+        return $this->db->execute($query, [':id' => $id]);
     }
 
     public function getStats() {
@@ -51,7 +52,8 @@ class FilesAdmin {
             COUNT(DISTINCT category) as total_categories,
             MAX(created_at) as last_upload
             FROM files";
-        return $this->db->query($query);
+        $result = $this->db->query($query);
+        return $result[0] ?? null;
     }
 
     public function getCategories() {

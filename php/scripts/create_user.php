@@ -20,20 +20,20 @@ class UserManager {
                 ':email' => $email
             ]);
 
-            if ($result && $result->fetchArray(SQLITE3_ASSOC)) {
+            if (!empty($result)) {
                 // User exists, update password
                 $updateQuery = "UPDATE admin_users SET 
                     password_hash = :password_hash,
                     is_active = 1
                     WHERE username = :username OR email = :email";
                 
-                $stmt = $this->db->query($updateQuery, [
+                $success = $this->db->execute($updateQuery, [
                     ':username' => $username,
                     ':email' => $email,
                     ':password_hash' => $passwordHash
                 ]);
 
-                if ($stmt) {
+                if ($success) {
                     return [
                         'success' => true,
                         'message' => 'User updated',
@@ -45,13 +45,13 @@ class UserManager {
                 $insertQuery = "INSERT INTO admin_users (username, email, password_hash, role, is_active) 
                               VALUES (:username, :email, :password_hash, 'admin', 1)";
                 
-                $stmt = $this->db->query($insertQuery, [
+                $success = $this->db->execute($insertQuery, [
                     ':username' => $username,
                     ':email' => $email,
                     ':password_hash' => $passwordHash
                 ]);
 
-                if ($stmt) {
+                if ($success) {
                     return [
                         'success' => true,
                         'message' => 'User created',
@@ -78,12 +78,12 @@ class UserManager {
                      password_hash = :password_hash 
                      WHERE username = :username";
             
-            $stmt = $this->db->query($query, [
+            $success = $this->db->execute($query, [
                 ':username' => $username,
                 ':password_hash' => $passwordHash
             ]);
 
-            if ($stmt) {
+            if ($success) {
                 return [
                     'success' => true,
                     'message' => 'Password updated',

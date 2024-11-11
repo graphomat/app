@@ -1,79 +1,118 @@
 <?php
-
-require_once __DIR__ . '/env.php';
+require_once __DIR__ . '/Logger.php';
 
 class Database {
     private static $instance = null;
-    private $db;
+    private $connection = null;
+    private $logger;
+    private $dbPath;
 
-    private function __construct() {
-        $dbPath = dirname(__DIR__) . '/' . Environment::get('DB_PATH', 'database.sqlite');
-        $dbDir = dirname($dbPath);
-        
-        // Create database directory if it doesn't exist
-        if (!file_exists($dbDir)) {
-            mkdir($dbDir, 0755, true);
-        }
-
-        try {
-            $this->db = new SQLite3($dbPath);
-            $this->db->enableExceptions(true);
-            
-            // Set pragmas for better performance and security
-            $this->db->exec('PRAGMA journal_mode=WAL');
-            $this->db->exec('PRAGMA foreign_keys=ON');
-        } catch (Exception $e) {
-            error_log('Database connection error: ' . $e->getMessage());
-            throw new Exception('Database connection failed');
-        }
+    private function __construct($dbPath) {
+        $this->logger = Logger::getInstance();
+        $this->dbPath = $dbPath;
+        $this->connect();
     }
 
-    public static function getInstance() {
+    public static function getInstance($dbPath = null) {
         if (self::$instance === null) {
-            self::$instance = new Database();
+            if ($dbPath === null) {
+                $dbPath = getenv('DB_PATH');
+                if (!$dbPath) {
+                    throw new Exception('DB_PATH environment variable is not set');
+                }
+            }
+            self::$instance = new self($dbPath);
         }
         return self::$instance;
     }
 
-    public function getConnection() {
-        return $this->db;
+    private function connect() {
+        try {
+            $this->logger->log("Connecting to database at path: " . $this->dbPath);
+            
+            // Create directory if it doesn't exist
+            $dbDir = dirname($this->dbPath);
+            if (!is_dir($dbDir)) {
+                mkdir($dbDir, 0777, true);
+            }
+            
+            $this->connection = new SQLite3($this->dbPath);
+            $this->connection->enableExceptions(true);
+            
+            $this->logger->log("Database connection established successfully");
+        } catch (Exception $e) {
+            $this->logger->logError("Database connection failed for path: " . $this->dbPath, $e);
+            throw $e;
+        }
     }
 
     public function query($sql, $params = []) {
         try {
-            $stmt = $this->db->prepare($sql);
+            $this->logger->logSQL($sql, $params);
+            
+            $stmt = $this->connection->prepare($sql);
             
             foreach ($params as $param => $value) {
                 $stmt->bindValue($param, $value);
             }
             
             $result = $stmt->execute();
+            $rows = [];
+            
+            while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+                $rows[] = $row;
+            }
+            
+            $result->finalize();
+            $this->logger->logSQL($sql, $params, $rows);
+            
+            return $rows;
+        } catch (Exception $e) {
+            $this->logger->logError("Query execution failed", $e);
+            throw $e;
+        }
+    }
+
+    public function execute($sql, $params = []) {
+        try {
+            $this->logger->logSQL($sql, $params);
+            
+            $stmt = $this->connection->prepare($sql);
+            
+            foreach ($params as $param => $value) {
+                $stmt->bindValue($param, $value);
+            }
+            
+            $result = $stmt->execute();
+            $this->logger->logSQL($sql, $params, "Statement executed");
+            
             return $result;
         } catch (Exception $e) {
-            error_log('Query error: ' . $e->getMessage());
-            throw new Exception('Query execution failed');
+            $this->logger->logError("Statement execution failed", $e);
+            throw $e;
         }
     }
 
-    public function changes() {
-        return $this->db->changes();
+    public function getLastInsertId() {
+        return $this->connection->lastInsertRowID();
     }
 
-    public function lastInsertRowID() {
-        return $this->db->lastInsertRowID();
+    public function beginTransaction() {
+        $this->logger->log("Beginning transaction", "TRANSACTION");
+        return $this->connection->exec('BEGIN TRANSACTION');
     }
 
-    public function close() {
-        if ($this->db) {
-            $this->db->close();
-        }
+    public function commit() {
+        $this->logger->log("Committing transaction", "TRANSACTION");
+        return $this->connection->exec('COMMIT');
     }
 
-    // Prevent cloning of the instance
-    private function __clone() {}
+    public function rollback() {
+        $this->logger->log("Rolling back transaction", "TRANSACTION");
+        return $this->connection->exec('ROLLBACK');
+    }
 
-    // Prevent unserializing of the instance
-    public function __wakeup() {
-        throw new Exception("Cannot unserialize singleton");
+    public function getConnection() {
+        return $this->connection;
     }
 }

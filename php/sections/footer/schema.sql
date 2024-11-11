@@ -1,5 +1,5 @@
 -- Footer links table schema
-CREATE TABLE footer_links (
+CREATE TABLE IF NOT EXISTS footer_links (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     url TEXT NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE footer_links (
 );
 
 -- Footer social links table schema
-CREATE TABLE footer_social (
+CREATE TABLE IF NOT EXISTS footer_social (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     platform TEXT NOT NULL,
     url TEXT NOT NULL,

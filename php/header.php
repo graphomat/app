@@ -1,21 +1,8 @@
 <?php
 session_start();
-require_once __DIR__ . '/config/Database.php';
-require_once __DIR__ . '/sections/meta/query.php';
 
-// Get current page ID from the URL or set to 'home' if on index
-$currentPage = basename($_SERVER['PHP_SELF'], '.php');
-$currentPage = $currentPage === 'index' ? 'home' : $currentPage;
-
-// Initialize database and get meta data
-$db = Database::getInstance()->getConnection();
-$metaQuery = new MetaQuery($db);
-$meta = $metaQuery->getMetaByPageId($currentPage);
-
-// If no specific meta data found, use global meta
-if (!$meta) {
-    $meta = $metaQuery->getMetaByPageId('global');
-}
+// Meta data should be passed from index.php in $metaData variable
+$meta = $metaData[0] ?? null;
 
 // Fallback configuration if no meta data found
 $config = [

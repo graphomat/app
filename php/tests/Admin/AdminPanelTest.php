@@ -15,19 +15,8 @@ class AdminPanelTest extends TestCase
     {
         parent::setUp();
         
-        // Load environment variables
-        $envFile = dirname(dirname(__DIR__)) . '/.env';
-        $envContent = file_get_contents($envFile);
-        $lines = explode("\n", $envContent);
-        
-        foreach ($lines as $line) {
-            if (strpos($line, 'APP_URL=') === 0) {
-                $this->baseUrl = trim(explode('=', $line)[1]);
-            }
-            if (strpos($line, 'ADMIN_PATH=') === 0) {
-                $this->adminPath = trim(explode('=', $line)[1]);
-            }
-        }
+        $this->baseUrl = getenv('APP_URL') . (getenv('APP_PORT') ? ':' . getenv('APP_PORT') : '');
+        $this->adminPath = getenv('ADMIN_PATH') ?: '/admin';
 
         $this->client = new Client([
             'base_uri' => $this->baseUrl,

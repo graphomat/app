@@ -7,8 +7,8 @@ docker-compose up -d
 echo "Waiting for web service to be ready..."
 sleep 5
 
-# Run the tests inside the container
-docker-compose exec web ./vendor/bin/phpunit --testdox
+# Run the tests inside the container with environment variables
+docker-compose exec -e APP_URL=http://localhost -e APP_PORT=80 -e ADMIN_PATH=/admin web ./vendor/bin/phpunit --testdox
 
 # Show the test results in a more readable format
 echo "Test execution completed."

@@ -23,18 +23,20 @@ class GalleryAdmin {
 
     public function getImages($category = null) {
         $query = "SELECT * FROM gallery";
+        $params = [];
         if ($category) {
-            $query .= " WHERE category = ? ORDER BY sort_order ASC, created_at DESC";
-            return $this->db->query($query, [$category]);
+            $query .= " WHERE category = :category ORDER BY sort_order ASC, created_at DESC";
+            $params[':category'] = $category;
+            return $this->db->query($query, $params);
         }
         return $this->db->query($query . " ORDER BY sort_order ASC, created_at DESC");
     }
 
     public function deleteImage($id) {
         // Get image info first
-        $query = "SELECT image_path, thumbnail_path FROM gallery WHERE id = ?";
-        $result = $this->db->query($query, [$id]);
-        $image = $result->fetchArray(SQLITE3_ASSOC);
+        $query = "SELECT image_path, thumbnail_path FROM gallery WHERE id = :id";
+        $result = $this->db->query($query, [':id' => $id]);
+        $image = $result[0] ?? null;
         
         if ($image) {
             // Delete physical files
@@ -47,13 +49,17 @@ class GalleryAdmin {
         }
         
         // Delete database record
-        $query = "DELETE FROM gallery WHERE id = ?";
-        return $this->db->query($query, [$id]);
+        $query = "DELETE FROM gallery WHERE id = :id";
+        return $this->db->execute($query, [':id' => $id]);
     }
 
     public function updateSortOrder($id, $newOrder) {
-        $query = "UPDATE gallery SET sort_order = ?, updated_at = ? WHERE id = ?";
-        return $this->db->query($query, [$newOrder, date('Y-m-d H:i:s'), $id]);
+        $query = "UPDATE gallery SET sort_order = :order, updated_at = :updated_at WHERE id = :id";
+        return $this->db->execute($query, [
+            ':order' => $newOrder,
+            ':updated_at' => date('Y-m-d H:i:s'),
+            ':id' => $id
+        ]);
     }
 
     public function getStats() {
@@ -63,7 +69,8 @@ class GalleryAdmin {
             MAX(created_at) as last_upload,
             SUM(CASE WHEN thumbnail_path IS NOT NULL THEN 1 ELSE 0 END) as thumbnails_count
             FROM gallery";
-        return $this->db->query($query);
+        $result = $this->db->query($query);
+        return $result[0] ?? null;
     }
 
     public function getCategories() {
@@ -78,8 +85,8 @@ class GalleryAdmin {
         
         foreach ($data as $field => $value) {
             if (in_array($field, $allowedFields)) {
-                $updates[] = "$field = ?";
-                $params[] = $value;
+                $updates[] = "$field = :$field";
+                $params[":$field"] = $value;
             }
         }
         
@@ -87,12 +94,12 @@ class GalleryAdmin {
             return false;
         }
         
-        $updates[] = "updated_at = ?";
-        $params[] = date('Y-m-d H:i:s');
-        $params[] = $id;
+        $updates[] = "updated_at = :updated_at";
+        $params[':updated_at'] = date('Y-m-d H:i:s');
+        $params[':id'] = $id;
         
-        $query = "UPDATE gallery SET " . implode(', ', $updates) . " WHERE id = ?";
-        return $this->db->query($query, $params);
+        $query = "UPDATE gallery SET " . implode(', ', $updates) . " WHERE id = :id";
+        return $this->db->execute($query, $params);
     }
 }
 

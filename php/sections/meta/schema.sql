@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS meta (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    page_id TEXT NOT NULL,
+    page_id INTEGER NOT NULL,
     title TEXT,
     description TEXT,
     keywords TEXT,
@@ -19,5 +19,6 @@ CREATE TABLE IF NOT EXISTS meta (
     canonical_url TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (page_id) REFERENCES pages(id),
     UNIQUE(page_id)
 );

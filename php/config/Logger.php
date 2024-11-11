@@ -1,0 +1,85 @@
+<?php
+class Logger {
+    private static $instance = null;
+    private $logFile;
+    private $errorLogFile;
+    private $startTime;
+
+    private function __construct() {
+        $date = date('Y-m-d');
+        $this->logFile = __DIR__ . "/../logs/app_{$date}.log";
+        $this->errorLogFile = __DIR__ . '/../logs/error.log';
+        $this->startTime = microtime(true);
+        
+        // Create logs directory if it doesn't exist
+        if (!is_dir(dirname($this->logFile))) {
+            mkdir(dirname($this->logFile), 0777, true);
+        }
+        
+        // Start new log entry
+        $this->log("=== Page Load Started ===");
+    }
+
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    public function log($message, $type = 'INFO') {
+        $timestamp = date('Y-m-d H:i:s');
+        $elapsed = round((microtime(true) - $this->startTime) * 1000, 2);
+        $logMessage = "[$timestamp][$type][{$elapsed}ms] $message" . PHP_EOL;
+        
+        // Ensure we're using today's log file
+        $date = date('Y-m-d');
+        $this->logFile = __DIR__ . "/../logs/app_{$date}.log";
+        
+        file_put_contents($this->logFile, $logMessage, FILE_APPEND);
+    }
+
+    public function logSQL($query, $params = [], $result = null) {
+        // Format the SQL query with parameters
+        $sql = $query;
+        if (!empty($params)) {
+            foreach ($params as $key => $value) {
+                $sql = str_replace(":$key", is_string($value) ? "'$value'" : $value, $sql);
+            }
+        }
+        
+        // Log the SQL statement
+        $this->log("SQL: $sql", 'SQL');
+        
+        // Log the result if provided
+        if ($result !== null) {
+            if (is_array($result)) {
+                $count = count($result);
+                $this->log("Result: $count rows returned", 'SQL_RESULT');
+            } else {
+                $this->log("Result: $result", 'SQL_RESULT');
+            }
+        }
+    }
+
+    public function logError($message, $exception = null) {
+        $timestamp = date('Y-m-d H:i:s');
+        $elapsed = round((microtime(true) - $this->startTime) * 1000, 2);
+        
+        $errorMsg = "ERROR: $message";
+        if ($exception) {
+            $errorMsg .= "\nException: " . $exception->getMessage() . 
+                        "\nTrace: " . $exception->getTraceAsString();
+        }
+        
+        // Format error message
+        $logMessage = "[$timestamp][ERROR][{$elapsed}ms] $errorMsg" . PHP_EOL;
+        
+        // Write to both logs - append to daily app log but overwrite error.log
+        $date = date('Y-m-d');
+        $this->logFile = __DIR__ . "/../logs/app_{$date}.log";
+        
+        file_put_contents($this->logFile, $logMessage, FILE_APPEND);
+        file_put_contents($this->errorLogFile, $logMessage); // Overwrites the file
+    }
+}

@@ -1,5 +1,5 @@
 -- DBT indications table schema
-CREATE TABLE dbt_indications
+CREATE TABLE IF NOT EXISTS dbt_indications
 (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     title       TEXT NOT NULL,

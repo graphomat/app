@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Enable Apache modules
-RUN a2enmod rewrite
+RUN a2enmod rewrite headers
 
 # Set working directory
 WORKDIR /var/www/html
@@ -22,14 +22,11 @@ COPY . /var/www/html/
 # Install dependencies
 RUN composer install --no-interaction --no-progress --prefer-dist
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+# Set permissions and create required directories
+RUN mkdir -p /var/www/html/data /var/www/html/logs \
+    && chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod -R 777 /var/www/html/data /var/www/html/logs
 
 # Configure Apache
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
-
-# Create data directory for SQLite
-RUN mkdir -p /var/www/html/data \
-    && chown -R www-data:www-data /var/www/html/data \
-    && chmod -R 755 /var/www/html/data
