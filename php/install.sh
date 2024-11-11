@@ -108,7 +108,7 @@ else
 fi
 
 
-rm -f logs/app.log
+rm -rf logs/*.log
 
 source .env
 # USER: Remove existing databases
