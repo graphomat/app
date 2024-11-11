@@ -1,8 +1,8 @@
 <?php
 $pageData = $this->db->query(
-    "SELECT s.* FROM sections s 
-    JOIN pages p ON s.page_id = p.id 
-    WHERE p.slug = 'training' AND s.name = 'modules'
+    "SELECT * FROM sections 
+    WHERE page_id = 8 
+    AND name = 'modules'
     LIMIT 1"
 );
 

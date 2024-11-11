@@ -1,11 +1,12 @@
 <?php
+require_once __DIR__ . '/../../config/env.php';
+require_once __DIR__ . '/../../config/Database.php';
 
 class ConsultationsQuery {
     private $db;
 
     public function __construct() {
-        global $db;
-        $this->db = $db;
+        $this->db = Database::getInstance()->getConnection();
     }
 
     public function getConsultationsData() {
