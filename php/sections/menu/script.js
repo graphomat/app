@@ -1,192 +1,118 @@
 document.addEventListener('DOMContentLoaded', function() {
-    initMobileMenu();
-    initSearch();
-    initStickyHeader();
-    initSubmenuAccessibility();
-});
-
-function initMobileMenu() {
+    // Mobile menu toggle
     const menuToggle = document.querySelector('.mobile-menu-toggle');
-    const nav = document.querySelector('.site-nav');
-    const submenuButtons = document.querySelectorAll('.has-submenu > .menu-link');
+    const siteNav = document.querySelector('.site-nav');
+
+    if (menuToggle) {
+        menuToggle.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+            
+            // Close all submenus when closing the mobile menu
+            if (!isExpanded) {
+                document.querySelectorAll('.has-submenu > button').forEach(btn => {
+                    btn.setAttribute('aria-expanded', 'false');
+                });
+            }
+        });
+    }
+
+    // Submenu toggles for mobile
+    const submenuToggles = document.querySelectorAll('.has-submenu > button');
     
-    if (!menuToggle || !nav) return;
-
-    menuToggle.addEventListener('click', function() {
-        const isExpanded = this.getAttribute('aria-expanded') === 'true';
-        this.setAttribute('aria-expanded', !isExpanded);
-        nav.classList.toggle('active');
-        
-        // Prevent body scroll when menu is open
-        document.body.style.overflow = !isExpanded ? 'hidden' : '';
-    });
-
-    // Handle submenu on mobile
-    submenuButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
+    submenuToggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+            // Only handle click for mobile view
             if (window.innerWidth <= 768) {
                 e.preventDefault();
-                const parent = this.parentElement;
-                const isExpanded = parent.getAttribute('aria-expanded') === 'true';
+                const isExpanded = this.getAttribute('aria-expanded') === 'true';
                 
-                // Close other open submenus
-                submenuButtons.forEach(btn => {
-                    if (btn !== this) {
-                        btn.parentElement.setAttribute('aria-expanded', 'false');
+                // Close other submenus
+                submenuToggles.forEach(otherToggle => {
+                    if (otherToggle !== this) {
+                        otherToggle.setAttribute('aria-expanded', 'false');
                     }
                 });
-                
-                parent.setAttribute('aria-expanded', !isExpanded);
+
+                this.setAttribute('aria-expanded', !isExpanded);
             }
         });
     });
 
-    // Close menu when clicking outside
+    // Close mobile menu when clicking outside
     document.addEventListener('click', function(e) {
-        if (window.innerWidth <= 768 && 
-            !nav.contains(e.target) && 
-            !menuToggle.contains(e.target) && 
-            nav.classList.contains('active')) {
-            menuToggle.setAttribute('aria-expanded', 'false');
-            nav.classList.remove('active');
-            document.body.style.overflow = '';
+        if (window.innerWidth <= 768) {
+            const isClickInside = siteNav?.contains(e.target) || menuToggle?.contains(e.target);
+            
+            if (!isClickInside && menuToggle?.getAttribute('aria-expanded') === 'true') {
+                menuToggle.setAttribute('aria-expanded', 'false');
+                submenuToggles.forEach(toggle => {
+                    toggle.setAttribute('aria-expanded', 'false');
+                });
+            }
         }
     });
-}
 
-function initSearch() {
+    // Handle window resize
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            if (window.innerWidth > 768) {
+                // Reset mobile menu state when returning to desktop
+                menuToggle?.setAttribute('aria-expanded', 'false');
+                submenuToggles.forEach(toggle => {
+                    toggle.setAttribute('aria-expanded', 'false');
+                });
+            }
+        }, 250);
+    });
+
+    // Sticky header behavior
+    const header = document.querySelector('.site-header[data-sticky="true"]');
+    if (header) {
+        let lastScroll = 0;
+        let ticking = false;
+
+        window.addEventListener('scroll', function() {
+            lastScroll = window.scrollY;
+
+            if (!ticking) {
+                window.requestAnimationFrame(function() {
+                    if (lastScroll > 100) {
+                        header.classList.add('is-sticky');
+                    } else {
+                        header.classList.remove('is-sticky');
+                    }
+                    ticking = false;
+                });
+
+                ticking = true;
+            }
+        });
+    }
+
+    // Search toggle functionality
     const searchToggle = document.querySelector('.search-toggle');
     const searchForm = document.querySelector('.search-form');
-    const searchInput = document.querySelector('.search-form input[type="search"]');
-    
-    if (!searchToggle || !searchForm) return;
 
-    searchToggle.addEventListener('click', function(e) {
-        e.preventDefault();
-        const isActive = searchForm.classList.contains('active');
-        
-        searchForm.classList.toggle('active');
-        this.setAttribute('aria-expanded', !isActive);
-        
-        if (!isActive && searchInput) {
-            searchInput.focus();
-        }
-    });
-
-    // Close search when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!searchToggle.contains(e.target) && 
-            !searchForm.contains(e.target) && 
-            searchForm.classList.contains('active')) {
-            searchForm.classList.remove('active');
-            searchToggle.setAttribute('aria-expanded', 'false');
-        }
-    });
-
-    // Close search on escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && searchForm.classList.contains('active')) {
-            searchForm.classList.remove('active');
-            searchToggle.setAttribute('aria-expanded', 'false');
-            searchToggle.focus();
-        }
-    });
-}
-
-function initStickyHeader() {
-    const header = document.querySelector('.site-header');
-    if (!header || header.getAttribute('data-sticky') !== 'true') return;
-
-    let lastScroll = 0;
-    const scrollThreshold = 50;
-
-    window.addEventListener('scroll', () => {
-        const currentScroll = window.pageYOffset;
-        
-        // Add box-shadow when scrolled
-        header.classList.toggle('scrolled', currentScroll > 0);
-
-        // Hide/show header based on scroll direction
-        if (Math.abs(currentScroll - lastScroll) < scrollThreshold) return;
-
-        if (currentScroll > lastScroll && currentScroll > header.offsetHeight) {
-            // Scrolling down
-            header.style.transform = 'translateY(-100%)';
-        } else {
-            // Scrolling up
-            header.style.transform = 'translateY(0)';
-        }
-
-        lastScroll = currentScroll;
-    }, { passive: true });
-}
-
-function initSubmenuAccessibility() {
-    const submenuButtons = document.querySelectorAll('.has-submenu > .menu-link');
-    
-    submenuButtons.forEach(button => {
-        // Set initial ARIA attributes
-        button.setAttribute('role', 'button');
-        button.setAttribute('aria-expanded', 'false');
-        
-        // Handle keyboard navigation
-        button.addEventListener('keydown', function(e) {
-            const submenu = this.nextElementSibling;
+    if (searchToggle && searchForm) {
+        searchToggle.addEventListener('click', function() {
             const isExpanded = this.getAttribute('aria-expanded') === 'true';
-            
-            switch (e.key) {
-                case ' ':
-                case 'Enter':
-                    e.preventDefault();
-                    this.setAttribute('aria-expanded', !isExpanded);
-                    if (!isExpanded && submenu) {
-                        const firstLink = submenu.querySelector('a');
-                        if (firstLink) firstLink.focus();
-                    }
-                    break;
-                    
-                case 'Escape':
-                    if (isExpanded) {
-                        e.preventDefault();
-                        this.setAttribute('aria-expanded', 'false');
-                        this.focus();
-                    }
-                    break;
-            }
-        });
-        
-        // Handle mouse interactions
-        button.addEventListener('mouseenter', function() {
-            this.setAttribute('aria-expanded', 'true');
-        });
-        
-        button.parentElement.addEventListener('mouseleave', function() {
-            const button = this.querySelector('.menu-link');
-            button.setAttribute('aria-expanded', 'false');
-        });
-    });
+            this.setAttribute('aria-expanded', !isExpanded);
+            searchForm.classList.toggle('is-active');
 
-    // Handle focus trap in submenus
-    const submenus = document.querySelectorAll('.submenu');
-    submenus.forEach(submenu => {
-        const links = submenu.querySelectorAll('a');
-        if (links.length === 0) return;
-        
-        const firstLink = links[0];
-        const lastLink = links[links.length - 1];
-        
-        firstLink.addEventListener('keydown', function(e) {
-            if (e.key === 'Tab' && e.shiftKey) {
-                e.preventDefault();
-                lastLink.focus();
+            if (!isExpanded) {
+                searchForm.querySelector('input').focus();
             }
         });
-        
-        lastLink.addEventListener('keydown', function(e) {
-            if (e.key === 'Tab' && !e.shiftKey) {
-                e.preventDefault();
-                firstLink.focus();
+
+        // Close search when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchToggle.contains(e.target) && !searchForm.contains(e.target)) {
+                searchToggle.setAttribute('aria-expanded', 'false');
+                searchForm.classList.remove('is-active');
             }
         });
-    });
-}
+    }
+});

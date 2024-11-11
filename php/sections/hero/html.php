@@ -12,6 +12,6 @@ $heroData = getHeroData();
         </button>
     </div>
     <div class="hero-image">
-        <img src="img/unitydbt-logo.png" alt="DBT Unity логотип - Диалектическая поведенческая терапия" height="300">
+        <img src="/img/unitydbt-logo.png" alt="DBT Unity логотип - Диалектическая поведенческая терапия" height="300">
     </div>
 </section>

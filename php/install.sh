@@ -6,6 +6,8 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+clear
+
 echo -e "${YELLOW}Starting installation...${NC}"
 
 # Check if PHP is installed
@@ -92,15 +94,7 @@ if echo "$ADMIN_INSTALL_RESULT" | grep -q '"success": *true' && ! echo "$ADMIN_I
     echo "Password: admin123"
     echo -e "${RED}IMPORTANT: Please change the default password after your first login!${NC}"
 
-    # Load Variables
-    HOSTNAME=${HOSTNAME:-localhost}
-    PORT=${PORT:-8007}
 
-    # Local PHP setup
-    echo -e "\n${YELLOW}Starting PHP development server...${NC}"
-    echo -e "You can access the application at: http://${HOSTNAME}:${PORT}"
-    echo -e "Press Ctrl+C to stop the server"
-    php -S ${HOSTNAME}:${PORT}
 else
     echo -e "${RED}Admin database installation failed:${NC}"
     echo "$ADMIN_INSTALL_RESULT"
@@ -115,12 +109,16 @@ source .env
 rm -f database.sqlite
 # Run the main database installation
 echo "Running main database installation..."
-INSTALL_RESULT=$(php install.php 2>&1)
-# Check if the installation was successful
-if echo "$INSTALL_RESULT" | grep -q '"success":true'; then
-    echo -e "${GREEN}Main database installation completed successfully!${NC}"
-else
-    echo -e "${RED}Main database installation failed with errors:${NC}"
-    echo "$INSTALL_RESULT"
-    exit 1
-fi
+php install.php
+
+
+
+# Load Variables
+HOSTNAME=${HOSTNAME:-localhost}
+PORT=${PORT:-8007}
+
+# Local PHP setup
+echo -e "\n${YELLOW}Starting PHP development server...${NC}"
+echo -e "You can access the application at: http://${HOSTNAME}:${PORT}"
+echo -e "Press Ctrl+C to stop the server"
+php -S ${HOSTNAME}:${PORT}

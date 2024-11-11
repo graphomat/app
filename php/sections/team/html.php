@@ -18,7 +18,7 @@ $teamMembers = $sectionData['team_members'] ?? [];
                 <div class="team-member">
                     <?php if (!empty($member['photo'])): ?>
                         <div class="member-photo">
-                            <img src="<?php echo htmlspecialchars($member['photo']); ?>" 
+                            <img src="/<?php echo htmlspecialchars($member['photo']); ?>"
                                  alt="<?php echo htmlspecialchars($member['name']); ?>">
                         </div>
                     <?php endif; ?>

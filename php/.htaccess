@@ -4,7 +4,7 @@
     RewriteBase /
 
     # Redirect /team to /specialists
-    RewriteRule ^team/?$ specialists [R=301,L]
+#    RewriteRule ^team/?$ specialists [R=301,L]
 
     # Handle front controller pattern
     RewriteCond %{REQUEST_FILENAME} !-f

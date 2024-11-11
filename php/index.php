@@ -2,6 +2,7 @@
 require_once __DIR__ . '/config/env.php';
 require_once __DIR__ . '/config/Logger.php';
 require_once __DIR__ . '/config/Database.php';
+putenv("APP_NAME=index");
 
 class PageLoader {
     private $logger;

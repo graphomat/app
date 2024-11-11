@@ -26,5 +26,5 @@ INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_or
 
 -- Certification configuration
 INSERT INTO config (name, value, type, description) VALUES
-    ('about_cert_image', 'img/unitydbt-cert.png', 'text', 'Certification image path'),
+    ('about_cert_image', '/img/unitydbt-cert.png', 'text', 'Certification image path'),
     ('about_cert_image_alt', 'Сертификат DBT Intensive Training от Behavioral Tech Institute', 'text', 'Certification image alt text');

@@ -18,11 +18,16 @@ INSERT OR IGNORE INTO footer_social (platform, url, icon_svg, sort_order) VALUES
 
 -- Footer section configuration
 INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
-    (1, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}');
+    (1, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}'),
+    (2, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}'),
+    (3, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}'),
+    (4, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}'),
+    (5, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}'),
+    (6, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}');
 
 -- Footer configuration
 INSERT INTO config (name, value, type, description) VALUES
     ('footer_copyright', '© 2024 DBT Unity. Все права защищены.', 'text', 'Footer copyright text'),
     ('footer_description', 'Комплексная ДБТ терапия для эффективного управления эмоциями', 'textarea', 'Footer description'),
     ('footer_columns', '3', 'number', 'Number of footer link columns'),
-    ('footer_logo', 'img/unitydbt-logo.png', 'text', 'Footer logo image path');
+    ('footer_logo', '/img/unitydbt-logo.png', 'text', 'Footer logo image path');

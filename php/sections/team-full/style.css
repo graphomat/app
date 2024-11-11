@@ -1,109 +1,115 @@
 .team-full-section {
-    padding: 4rem 0;
+    padding: 80px 0;
     background-color: #fff;
 }
 
-.team-full-section .section-title {
+.team-full-section .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.section-title {
     text-align: center;
-    margin-bottom: 2rem;
     font-size: 2.5rem;
+    margin-bottom: 1.5rem;
     color: #333;
 }
 
-.team-full-section .section-description {
+.section-description {
     text-align: center;
     max-width: 800px;
-    margin: 0 auto 3rem;
+    margin: 0 auto 4rem;
     color: #666;
     line-height: 1.6;
 }
 
 .team-full-grid {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 3rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
 }
 
 .team-member-full {
     background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     overflow: hidden;
-    transition: transform 0.3s ease;
-}
-
-.team-member-full:hover {
-    transform: translateY(-5px);
+    padding: 2rem;
 }
 
 .member-header {
-    display: grid;
-    grid-template-columns: minmax(200px, 1fr) 2fr;
+    display: flex;
     gap: 2rem;
-    padding: 2rem;
-    background: linear-gradient(to right, #f8f9fa, #fff);
+    margin-bottom: 2rem;
 }
 
 .member-photo {
-    width: 100%;
-    aspect-ratio: 1;
+    flex-shrink: 0;
+    width: 250px;
+    height: 300px;
+    border-radius: 10px;
     overflow: hidden;
-    border-radius: 8px;
 }
 
 .member-photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.member-photo img:hover {
+    transform: scale(1.05);
 }
 
 .member-title-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex-grow: 1;
+    padding-top: 1rem;
 }
 
 .member-name {
-    font-size: 1.8rem;
-    color: #333;
+    font-size: 2rem;
     margin: 0 0 0.5rem;
+    color: #333;
 }
 
 .member-position {
-    font-size: 1.2rem;
-    color: #666;
-    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+    color: #555;
+    margin-bottom: 1rem;
 }
 
 .member-credentials {
-    color: #888;
+    font-size: 1.1rem;
+    color: #666;
     font-style: italic;
 }
 
 .member-content {
-    padding: 2rem;
+    color: #444;
+    line-height: 1.7;
 }
 
 .member-bio-full {
     margin-bottom: 2rem;
-    line-height: 1.6;
-    color: #444;
+    font-size: 1.1rem;
 }
 
 .member-specialties,
 .member-education,
 .member-publications {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .member-specialties h4,
 .member-education h4,
 .member-publications h4 {
     color: #333;
-    margin-bottom: 1rem;
     font-size: 1.2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #eee;
 }
 
 .member-specialties ul,
@@ -117,58 +123,61 @@
 .member-specialties li,
 .member-education li,
 .member-publications li {
-    padding: 0.5rem 0;
+    margin-bottom: 0.5rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.member-specialties li:before,
+.member-education li:before,
+.member-publications li:before {
+    content: "•";
+    position: absolute;
+    left: 0;
     color: #666;
-    line-height: 1.4;
 }
 
-.member-specialties li {
-    display: inline-block;
-    background: #f8f9fa;
-    padding: 0.5rem 1rem;
-    margin: 0.25rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-}
-
-/* Responsive Design */
-@media (max-width: 992px) {
+/* Responsive adjustments */
+@media (max-width: 900px) {
     .member-header {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+        align-items: center;
         text-align: center;
+        gap: 1.5rem;
     }
 
     .member-photo {
-        max-width: 300px;
-        margin: 0 auto;
+        width: 200px;
+        height: 250px;
+    }
+
+    .member-title-info {
+        padding-top: 0;
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
     .team-full-section {
-        padding: 3rem 0;
+        padding: 40px 0;
     }
 
-    .section-title {
-        font-size: 2rem;
+    .team-member-full {
+        padding: 1.5rem;
     }
 
     .member-name {
-        font-size: 1.5rem;
+        font-size: 1.75rem;
     }
 
     .member-position {
         font-size: 1.1rem;
     }
-}
 
-@media (max-width: 480px) {
-    .team-full-section {
-        padding: 2rem 0;
+    .member-credentials {
+        font-size: 1rem;
     }
 
-    .member-header,
-    .member-content {
-        padding: 1.5rem;
+    .member-bio-full {
+        font-size: 1rem;
     }
 }

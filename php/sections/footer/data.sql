@@ -7,7 +7,7 @@ VALUES
 -- Initial footer configuration
 INSERT OR IGNORE INTO config (name, value, type, description)
 VALUES
-    ('footer_copyright', '© 2024 DBT Unity. Все права защищены.', 'text', 'Footer copyright text'), ('footer_description', 'Комплексная ДБТ терапия для эффективного управления эмоциями', 'textarea', 'Footer description'), ('footer_columns', '3', 'number', 'Number of footer link columns'), ('footer_logo', 'img/unitydbt-logo.png', 'text', 'Footer logo image path');
+    ('footer_copyright', '© 2024 DBT Unity. Все права защищены.', 'text', 'Footer copyright text'), ('footer_description', 'Комплексная ДБТ терапия для эффективного управления эмоциями', 'textarea', 'Footer description'), ('footer_columns', '3', 'number', 'Number of footer link columns'), ('footer_logo', '/img/unitydbt-logo.png', 'text', 'Footer logo image path');
 
 -- Initial footer links
 INSERT INTO footer_links (title, url, column_number, sort_order)

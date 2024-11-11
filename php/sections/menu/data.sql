@@ -6,7 +6,7 @@ VALUES
 
 -- Menu settings in config
 INSERT INTO config (name, value, type, description)
-VALUES ('menu_logo', 'img/unitydbt-logo.png', 'text', 'Menu logo image path'),
+VALUES ('menu_logo', '/img/unitydbt-logo.png', 'text', 'Menu logo image path'),
        ('menu_logo_alt', 'DBT Unity', 'text', 'Menu logo alt text'),
        ('menu_mobile_breakpoint', '768', 'number', 'Mobile menu breakpoint in pixels'),
        ('menu_sticky', 'true', 'boolean', 'Enable sticky menu'),
@@ -16,11 +16,11 @@ VALUES ('menu_logo', 'img/unitydbt-logo.png', 'text', 'Menu logo image path'),
 
 -- Initial menu items
 INSERT INTO menu_items (title, url, position, is_active)
-VALUES ('О НАС', 'index.php', 1, 1),
-       ('ТРЕНИНГ НАВЫКОВ', 'training.php', 2, 1),
-       ('СПЕЦИАЛИСТЫ', 'specialists.php', 3, 1),
-       ('ЧТО ТАКОЕ ДБТ', 'about-dbt.php', 4, 1),
-       ('КОНТАКТЫ', 'contact.php', 5, 1);
+VALUES ('О НАС', 'index', 1, 1),
+       ('ТРЕНИНГ НАВЫКОВ', 'training', 2, 1),
+       ('СПЕЦИАЛИСТЫ', 'specialists', 3, 1),
+       ('ЧТО ТАКОЕ ДБТ', 'about-dbt', 4, 1),
+       ('КОНТАКТЫ', 'contact', 5, 1);
 
 
 -- Initial categories

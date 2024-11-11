@@ -29,7 +29,7 @@ $aboutData = getAboutData();
         <div class="certification-card" aria-labelledby="cert-heading">
             <a href="Cert_Unity_241108_073542.pdf" 
                aria-label="Посмотреть сертификат <?php echo htmlspecialchars(isset($aboutData['certification']['institution']) ? $aboutData['certification']['institution'] : ''); ?>">
-                <img src="img/unitydbt-cert.png" 
+                <img src="/img/unitydbt-cert.png"
                      alt="Сертификат <?php echo htmlspecialchars(isset($aboutData['certification']['program']) ? $aboutData['certification']['program'] : ''); ?> от <?php echo htmlspecialchars(isset($aboutData['certification']['institution']) ? $aboutData['certification']['institution'] : ''); ?>" 
                      class="certification-logo"
                      height="350">

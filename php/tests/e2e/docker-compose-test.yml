@@ -1,4 +1,3 @@
----
 - name: Test Docker Compose Deployment
   hosts: localhost
   gather_facts: yes
@@ -15,27 +14,29 @@
         msg: "Docker is not running"
       when: docker_status.rc != 0
 
+    - name: Create required directories
+      file:
+        path: "{{ playbook_dir }}/../../{{ item }}"
+        state: directory
+        mode: '0777'
+      with_items:
+        - logs
+        - data
+
     - name: Build and start containers
-      community.docker.docker_compose:
+      community.docker.docker_compose_v2:
         project_src: "{{ playbook_dir }}/../../"
         state: present
       register: compose_result
       
     - name: Wait for web service to be ready
       uri:
-        url: "http://localhost:8007"
-        return_content: yes
-      register: webpage
-      until: webpage.status == 200
-      retries: 30
-      delay: 2
-      
-    - name: Verify PHP is working
-      uri:
         url: "http://localhost:8007/test.php"
         return_content: yes
-      register: php_test
-      failed_when: "'PHP is working' not in php_test.content"
+      register: webpage
+      until: "'PHP is working' in webpage.content"
+      retries: 30
+      delay: 2
       
     - name: Check logs directory permissions
       community.docker.docker_container_exec:
@@ -59,7 +60,7 @@
       failed_when: apache_config.rc != 0
       
     - name: Clean up
-      community.docker.docker_compose:
+      community.docker.docker_compose_v2:
         project_src: "{{ playbook_dir }}/../../"
         state: absent
       when: cleanup is defined and cleanup

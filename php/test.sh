@@ -42,11 +42,36 @@ wait_for_server() {
     return 1
 }
 
+# Check required tools
+check_requirements() {
+    print_header "Checking Requirements"
+    
+    # Check if ansible is installed
+    if ! command -v ansible-playbook &> /dev/null; then
+        echo -e "${RED}Ansible is not installed. Please install it first.${NC}"
+        return 1
+    fi
+    
+    # Check if docker is installed
+    if ! command -v docker &> /dev/null; then
+        echo -e "${RED}Docker is not installed. Please install it first.${NC}"
+        return 1
+    fi
+    
+    echo -e "${GREEN}All requirements satisfied${NC}"
+    return 0
+}
+
 # Main testing sequence
 echo -e "${BLUE}Starting test suite...${NC}"
 
 # Initialize error counter
 errors=0
+
+# Check requirements first
+if ! check_requirements; then
+    exit 1
+fi
 
 # 1. Setup test environment
 print_header "Setting up test environment"
@@ -76,7 +101,8 @@ check_result $? "Initialize database"
 
 # Make scripts executable
 chmod +x api/tests/api_tests.sh
-check_result $? "Make API tests executable"
+chmod +x tests/e2e/run-tests.sh
+check_result $? "Make test scripts executable"
 
 # Kill any existing PHP server on port 8007
 pkill -f "php -S localhost:8007" || true
@@ -116,6 +142,37 @@ if [ -f "vendor/bin/phpunit" ]; then
 else
     echo -e "${RED}PHPUnit not found. Please run 'composer install' first.${NC}"
     ((errors++))
+fi
+
+# 5. Run E2E Tests
+print_header "Running E2E Tests"
+# Install required Ansible collections
+echo "Installing required Ansible collections..."
+ansible-galaxy collection install community.docker
+
+# Run the e2e tests
+cd tests/e2e && ./run-tests.sh
+if ! check_result $? "E2E Tests"; then
+    ((errors++))
+fi
+cd ../..
+
+# 6. Run Ansible Tests
+print_header "Running Ansible Tests"
+# Run ansible-playbook in check mode to validate playbooks
+ansible-playbook tests/e2e/docker-compose-test.yml --check
+if ! check_result $? "Ansible Playbook Validation"; then
+    ((errors++))
+fi
+
+# Run ansible-lint if available
+if command -v ansible-lint &> /dev/null; then
+    ansible-lint tests/e2e/docker-compose-test.yml
+    if ! check_result $? "Ansible Lint"; then
+        ((errors++))
+    fi
+else
+    echo -e "${BLUE}ansible-lint not found. Skipping linting.${NC}"
 fi
 
 # Cleanup

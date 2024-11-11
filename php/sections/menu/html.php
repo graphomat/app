@@ -24,7 +24,7 @@ function renderMenuItem($item) {
         }
         $output .= '</ul>';
     } else {
-        $output .= '<a href="' . htmlspecialchars($item['url']) . '" 
+        $output .= '<a href="/' . htmlspecialchars($item['url']) . '" 
                       class="menu-link' . $iconClass . '"
                       target="' . htmlspecialchars($target) . '">';
         $output .= htmlspecialchars($item['title']);
@@ -67,7 +67,7 @@ function renderCategoryMenuItem($category) {
     <div class="header-container">
         <!-- Logo -->
         <a href="/" class="site-logo">
-            <img src="<?php echo htmlspecialchars($data['config']['logo'] ?? '/img/unitydbt-logo.png'); ?>" 
+            <img src="<?php echo htmlspecialchars($data['config']['logo'] ?? '/img/unitydbt-logo.png'); ?>"
                  alt="<?php echo htmlspecialchars($data['config']['logo_alt'] ?? 'Unity DBT'); ?>"
                  width="150" height="50">
         </a>

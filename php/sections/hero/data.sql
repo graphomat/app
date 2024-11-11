@@ -13,7 +13,7 @@ INSERT INTO config (name, value, type, description, updated_at) VALUES
 ('hero_cta_text', 'ЗАПИСАТЬСЯ НА ПРИЕМ СПЕЦИАЛИСТА', 'text', 'Hero section CTA button text', CURRENT_TIMESTAMP);
 
 INSERT INTO config (name, value, type, description, updated_at) VALUES
-('hero_image', 'img/unitydbt-logo.png', 'text', 'Hero section main image', CURRENT_TIMESTAMP);
+('hero_image', '/img/unitydbt-logo.png', 'text', 'Hero section main image', CURRENT_TIMESTAMP);
 
 INSERT INTO config (name, value, type, description, updated_at) VALUES
 ('hero_image_alt', 'DBT Unity логотип - Диалектическая поведенческая терапия', 'text', 'Hero section image alt text', CURRENT_TIMESTAMP);

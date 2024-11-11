@@ -6,8 +6,9 @@ class Logger {
     private $startTime;
 
     private function __construct() {
+        $app_name = getenv('APP_NAME');
         $date = date('Y-m-d');
-        $this->logFile = __DIR__ . "/../logs/app_{$date}.log";
+        $this->logFile = __DIR__ . "/../logs/{$app_name}_{$date}.log";
         $this->errorLogFile = __DIR__ . '/../logs/error.log';
         $this->startTime = microtime(true);
         
