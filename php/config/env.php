@@ -27,7 +27,7 @@ loadEnv();
 define('DEBUG', getenv('APP_DEBUG') === 'true');
 
 // Database settings
-define('DB_PATH', getenv('DB_PATH') ?: __DIR__ . '/../data/site.db');
+define('DB_PATH', getenv('DB_PATH') ?: __DIR__ . '/../database.site');
 
 // Site settings
 define('SITE_NAME', getenv('APP_NAME') ?: 'Unity DBT');

@@ -94,3 +94,6 @@ Dodaj do kazdej sekcji plik test.php, ktory pozwoli na przetestowanie modulu pod
 Dodaj rss
 
 
+
+Stworz strukture dla projektow stron www, wedle wzoru: /www/{domain}/sections/{section}/data.sql
+Przenieś dla pierwszej strony localhost wszystkie SQL z index.sql do odpowiednich folderów i plików w  /www/{domain}/sections/{section}/data.sql

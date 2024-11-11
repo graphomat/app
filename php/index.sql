@@ -183,7 +183,7 @@ INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_or
     (6, 'map', 'Как добраться', 'Схема проезда', 'map', 3, '{"coordinates": "XX.XXXXX,XX.XXXXX"}');
 
 -- Team members
-INSERT OR IGNORE INTO team_members (name, position_key, bio_key, photo, credentials, specialties, education, publications, is_active, display_order) VALUES
+INSERT OR IGNORE INTO team_members (name, position_key, bio_key, photo, credentials, specialties, education, publications, is_active, sort_order) VALUES
     ('Dr. Sarah Johnson', 'clinical_director', 'sarah_bio', '/img/team/sarah.jpg', 'PhD, Licensed Psychologist', '["dbt","cbt","trauma"]', '[{"degree": "PhD in Clinical Psychology", "institution": "Stanford University"}]', '[]', 1, 1),
     ('Dr. Michael Chen', 'lead_therapist', 'michael_bio', '/img/team/michael.jpg', 'PsyD, DBT-LBC', '["dbt","adolescent","family"]', '[{"degree": "PsyD in Psychology", "institution": "UCLA"}]', '[]', 1, 2),
     ('Lisa Rodriguez', 'skills_trainer', 'lisa_bio', '/img/team/lisa.jpg', 'LCSW, DBT-LBC', '["dbt","group","mindfulness"]', '[{"degree": "MSW", "institution": "Columbia University"}]', '[]', 1, 3),
@@ -219,19 +219,40 @@ INSERT INTO certification_instructors (certification_id, name, title, sort_order
 
 -- Configuration settings
 INSERT INTO config (name, value, type, description) VALUES
-    ('site_name', 'Unity DBT', 'text', 'Website name'),
-    ('contact_email', 'contact@unitydbt.com', 'email', 'Contact email address'),
-    ('phone_number', '(555) 123-4567', 'text', 'Contact phone number'),
-    ('address', '123 Therapy Street, Suite 100, Mental Health City, MH 12345', 'text', 'Physical address'),
-    ('footer_copyright', '© 2024 DBT Unity. Все права защищены.', 'text', 'Footer copyright text'),
-    ('footer_description', 'Комплексная ДБТ терапия для эффективного управления эмоциями', 'textarea', 'Footer description'),
-    ('footer_columns', '3', 'number', 'Number of footer link columns'),
-    ('footer_logo', 'img/unitydbt-logo.png', 'text', 'Footer logo image path'),
-    ('menu_logo', 'img/unitydbt-logo.png', 'text', 'Menu logo image path'),
-    ('menu_logo_alt', 'DBT Unity', 'text', 'Menu logo alt text'),
-    ('menu_mobile_breakpoint', '768', 'number', 'Mobile menu breakpoint in pixels'),
-    ('menu_sticky', 'true', 'boolean', 'Enable sticky menu'),
-    ('menu_show_search', 'true', 'boolean', 'Show search in menu'),
-    ('menu_cta_text', 'ЗАПИСАТЬСЯ НА ПРИЕМ', 'text', 'Call to action button text'),
-    ('menu_cta_url', '#contact', 'text', 'Call to action button URL'),
-    ('about_cert_image',
+                                                        ('site_name', 'Unity DBT', 'text', 'Website name'),
+                                                        ('contact_email', 'contact@unitydbt.com', 'email', 'Contact email address'),
+                                                        ('phone_number', '(555) 123-4567', 'text', 'Contact phone number'),
+                                                        ('address', '123 Therapy Street, Suite 100, Mental Health City, MH 12345', 'text', 'Physical address'),
+                                                        ('footer_copyright', '© 2024 DBT Unity. Все права защищены.', 'text', 'Footer copyright text'),
+                                                        ('footer_description', 'Комплексная ДБТ терапия для эффективного управления эмоциями', 'textarea', 'Footer description'),
+                                                        ('footer_columns', '3', 'number', 'Number of footer link columns'),
+                                                        ('footer_logo', 'img/unitydbt-logo.png', 'text', 'Footer logo image path'),
+                                                        ('menu_logo', 'img/unitydbt-logo.png', 'text', 'Menu logo image path'),
+                                                        ('menu_logo_alt', 'DBT Unity', 'text', 'Menu logo alt text'),
+                                                        ('menu_mobile_breakpoint', '768', 'number', 'Mobile menu breakpoint in pixels'),
+                                                        ('menu_sticky', 'true', 'boolean', 'Enable sticky menu'),
+                                                        ('menu_show_search', 'true', 'boolean', 'Show search in menu'),
+                                                        ('menu_cta_text', 'ЗАПИСАТЬСЯ НА ПРИЕМ', 'text', 'Call to action button text'),
+                                                        ('menu_cta_url', '#contact', 'text', 'Call to action button URL'),
+                                                        ('about_cert_image', 'img/unitydbt-cert.png', 'text', 'Certification image path'),
+     ('about_cert_image_alt', 'Сертификат DBT Intensive Training от Behavioral Tech Institute', 'text', 'Certification image alt text');
+
+-- Menu items
+INSERT INTO menu_items (title, url, position, is_active) VALUES
+                                                             ('О НАС', 'index', 1, 1),
+                                                             ('ТРЕНИНГ НАВЫКОВ', 'training', 2, 1),
+                                                             ('СПЕЦИАЛИСТЫ', 'specialists', 3, 1),
+                                                             ('ЧТО ТАКОЕ ДБТ', 'about-dbt', 4, 1),
+                                                             ('КОНТАКТЫ', 'contact', 5, 1);
+
+-- Menu categories
+INSERT INTO menu_categories (name, slug, description, show_in_menu, menu_position) VALUES
+                                                                                       ('Блог', 'blog', 'Статьи и новости', 1, 6),
+                                                                                       ('Услуги', 'services', 'Наши услуги', 1, 7);
+
+-- Team members
+INSERT INTO team_members (name, title, bio, is_active, sort_order) VALUES
+                                                                       ('Dr. Sarah Johnson', 'Clinical Director', 'Dr. Johnson is a licensed psychologist with over 15 years of experience in DBT.', 1, 1),
+                                                                       ('Dr. Michael Chen', 'Lead DBT Therapist', 'Dr. Chen specializes in adolescent DBT and family therapy.', 1, 2),
+                                                                       ('Lisa Rodriguez, LCSW', 'Group Skills Trainer', 'Lisa has extensive experience leading DBT skills training groups.', 1, 3),
+                                                                       ('James Wilson, PhD', 'Research Director', 'Dr. Wilson focuses on treatment outcomes and program development.', 1, 4);

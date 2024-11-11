@@ -11,14 +11,14 @@ CREATE TABLE IF NOT EXISTS team_members
     education     TEXT,         -- JSON array of education entries
     publications  TEXT,         -- JSON array of publication entries
     is_active     INTEGER DEFAULT 1,
-    display_order INTEGER DEFAULT 0,
+    sort_order    INTEGER DEFAULT 0,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create indexes after table exists
 CREATE INDEX IF NOT EXISTS idx_team_members_active ON team_members(is_active);
-CREATE INDEX IF NOT EXISTS idx_team_members_display_order ON team_members(display_order);
+CREATE INDEX IF NOT EXISTS idx_team_members_sort_order ON team_members(sort_order);
 
 -- Ensure translations table exists (if not already created by other sections)
 CREATE TABLE IF NOT EXISTS translations
@@ -51,7 +51,7 @@ INSERT OR IGNORE INTO translations (language_id, content_type, content_id, field
 SELECT 
     l.id,
     'section',
-    (SELECT id FROM sections WHERE name = 'team-full' LIMIT 1),
+    (SELECT id FROM sections WHERE name = 'team-full'),
     'title',
     'Our Team'
 FROM languages l
@@ -61,7 +61,7 @@ INSERT OR IGNORE INTO translations (language_id, content_type, content_id, field
 SELECT 
     l.id,
     'section',
-    (SELECT id FROM sections WHERE name = 'team-full' LIMIT 1),
+    (SELECT id FROM sections WHERE name = 'team-full'),
     'description',
     'Meet our experienced team of professionals'
 FROM languages l

@@ -1,17 +1,3 @@
--- Team members table schema and data
-CREATE TABLE IF NOT EXISTS team_members
-(
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    name       TEXT NOT NULL,
-    title      TEXT,
-    bio        TEXT,
-    is_active  BOOLEAN  DEFAULT 1,
-    sort_order INTEGER  DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
-
 -- Certification details table schema and data
 CREATE TABLE IF NOT EXISTS certification_details
 (
