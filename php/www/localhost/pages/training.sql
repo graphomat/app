@@ -1,12 +1,23 @@
 -- Training page configuration
-INSERT OR IGNORE INTO pages (site_id, title, slug, meta_description, meta_keywords, status) VALUES
+INSERT INTO pages (site_id, title, slug, meta_description, meta_keywords, status) VALUES
     (1, 'Тренинг навыков DBT', 'training',
     'Программа обучения навыкам DBT. Развитие эмоциональной регуляции, осознанности и межличностной эффективности.',
     'DBT тренинг, навыки DBT, обучение DBT, групповой тренинг, эмоциональная регуляция',
     'published');
 
+-- Menu section configuration
+INSERT INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
+    (8, 'menu', 'Main Menu', 'Navigation menu', 'menu', 0,
+     '{"logo": "/img/unitydbt-logo.png", "logo_alt": "Unity DBT", "show_search": true, "sticky": true, "mobile_breakpoint": 768, "cta_text": "ЗАПИСАТЬСЯ НА ПРИЕМ", "cta_url": "#contact"}');
+
+
+-- Footer section configuration
+INSERT INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
+    (8, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}');
+
+
 -- Training page sections configuration
-INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data, position) VALUES
+INSERT INTO sections (page_id, name, title, description, type, sort_order, data, position) VALUES
     (8, 'training-intro', 'Программа обучения навыкам DBT', 
     'Комплексная программа развития навыков управления эмоциями и построения качественной жизни', 
     'content', 1,

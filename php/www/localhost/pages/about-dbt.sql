@@ -1,12 +1,23 @@
 -- About DBT page configuration
-INSERT OR IGNORE INTO pages (site_id, title, slug, meta_description, meta_keywords, status) VALUES
+INSERT INTO pages (site_id, title, slug, meta_description, meta_keywords, status) VALUES
     (1, 'О диалектической поведенческой терапии (DBT)', 'about-dbt',
     'Узнайте о диалектической поведенческой терапии (DBT): принципы, компоненты и эффективность метода. Научно доказанный подход к работе с эмоциональной нестабильностью.',
     'DBT, диалектическая поведенческая терапия, DBT терапия, эмоциональная регуляция, осознанность, навыки DBT',
     'published');
 
+-- Menu section configuration
+INSERT INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
+    (6, 'menu', 'Main Menu', 'Navigation menu', 'menu', 0,
+     '{"logo": "/img/unitydbt-logo.png", "logo_alt": "Unity DBT", "show_search": true, "sticky": true, "mobile_breakpoint": 768, "cta_text": "ЗАПИСАТЬСЯ НА ПРИЕМ", "cta_url": "#contact"}');
+
+
+-- Footer section configuration
+INSERT INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
+    (6, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}');
+
+
 -- About DBT page sections configuration
-INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data, position) VALUES
+INSERT INTO sections (page_id, name, title, description, type, sort_order, data, position) VALUES
     (6, 'dbt-intro', 'Что такое DBT?', 'Введение в диалектическую поведенческую терапию', 'content', 1,
     '{"content": "Диалектическая поведенческая терапия (DBT) – это научно доказанный метод психотерапии, разработанный Маршей Линехан. DBT сочетает принципы когнитивно-поведенческой терапии с практиками осознанности и диалектическим мировоззрением. Этот подход особенно эффективен при работе с эмоциональной нестабильностью и помогает развить навыки управления эмоциями, построения отношений и повышения качества жизни."}', 0),
     

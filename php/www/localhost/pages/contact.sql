@@ -1,12 +1,23 @@
 -- Contact page configuration
-INSERT OR IGNORE INTO pages (site_id, title, slug, meta_description, meta_keywords, status) VALUES
+INSERT INTO pages (site_id, title, slug, meta_description, meta_keywords, status) VALUES
     (1, 'Контакты Unity DBT', 'contact',
     'Свяжитесь с Unity DBT. Запись на консультации, контактная информация и адрес центра диалектической поведенческой терапии.',
     'контакты DBT, запись на консультацию, адрес центра DBT, телефон DBT центра',
     'published');
 
+-- Menu section configuration
+INSERT INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
+    (7, 'menu', 'Main Menu', 'Navigation menu', 'menu', 0,
+     '{"logo": "/img/unitydbt-logo.png", "logo_alt": "Unity DBT", "show_search": true, "sticky": true, "mobile_breakpoint": 768, "cta_text": "ЗАПИСАТЬСЯ НА ПРИЕМ", "cta_url": "#contact"}');
+
+
+-- Footer section configuration
+INSERT INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
+    (7, 'footer', 'Footer', 'Page footer', 'footer', 100, '{}');
+
+
 -- Contact page sections configuration
-INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data, position) VALUES
+INSERT INTO sections (page_id, name, title, description, type, sort_order, data, position) VALUES
     (7, 'contact-intro', 'Свяжитесь с нами', 'Контактная информация Unity DBT', 'content', 1,
     '{"content": "Мы готовы ответить на ваши вопросы и помочь записаться на консультацию. Выберите удобный для вас способ связи."}', 0),
     
@@ -66,7 +77,7 @@ INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_or
 
 
 -- Contact sections configuration
-INSERT OR IGNORE INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
+INSERT INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
     (7, 'contact-info', 'Контактная информация', 'Как с нами связаться', 'contact', 1,
     '{"phone": "+7 (XXX) XXX-XX-XX", "email": "contact@unitydbt.ru", "address": "Адрес клиники"}'),
     (7, 'contact-form', 'Форма обратной связи', 'Отправьте нам сообщение', 'form', 2, '{}'),

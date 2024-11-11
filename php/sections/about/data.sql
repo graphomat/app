@@ -1,7 +1,3 @@
--- About section configuration
-INSERT OR REPLACE INTO sections (name, title, description, type, sort_order) VALUES
-('about', 'About Section', 'Information about the team and certification', 'about', 3);
-
 
 INSERT INTO team_members (name, sort_order) VALUES
 ('Daria Dymont', 1),

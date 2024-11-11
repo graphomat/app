@@ -1,5 +1,5 @@
 -- Team members
-INSERT OR IGNORE INTO team_members (name, position_key, bio_key, photo, credentials, specialties, education, publications, is_active, sort_order) VALUES
+INSERT INTO team_members (name, position_key, bio_key, photo, credentials, specialties, education, publications, is_active, sort_order) VALUES
     ('Dr. Sarah Johnson', 'clinical_director', 'sarah_bio', '/img/team/sarah.jpg', 'PhD, Licensed Psychologist', '["dbt","cbt","trauma"]', '[{"degree": "PhD in Clinical Psychology", "institution": "Stanford University"}]', '[]', 1, 1),
     ('Dr. Michael Chen', 'lead_therapist', 'michael_bio', '/img/team/michael.jpg', 'PsyD, DBT-LBC', '["dbt","adolescent","family"]', '[{"degree": "PsyD in Psychology", "institution": "UCLA"}]', '[]', 1, 2),
     ('Lisa Rodriguez', 'skills_trainer', 'lisa_bio', '/img/team/lisa.jpg', 'LCSW, DBT-LBC', '["dbt","group","mindfulness"]', '[{"degree": "MSW", "institution": "Columbia University"}]', '[]', 1, 3),
