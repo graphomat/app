@@ -30,6 +30,54 @@ function loadSql($db, $dataFile, $logger)
     }
 }
 
+function loadCreateTableSql($db, $dataFile, $logger)
+{
+    $data = file_get_contents($dataFile);
+
+    // Split on semicolons but keep them in the statements
+    $statements = preg_split('/(?<=[;])/', $data, -1, PREG_SPLIT_NO_EMPTY);
+
+    foreach ($statements as $statement) {
+        $statement = trim($statement);
+        if (!empty($statement)) {
+            // Execute CREATE TABLE and CREATE INDEX statements
+            if (preg_match('/^\s*CREATE\s+(?:TABLE|INDEX)/i', $statement)) {
+                try {
+                    $db->execute($statement);
+                } catch (Exception $e) {
+                    echo "Error executing schema statement: " . $statement . "\n";
+                    $logger->logError("Error executing schema statement: " . $statement, $e);
+                    throw $e;
+                }
+            }
+        }
+    }
+}
+
+function loadNonCreateSql($db, $dataFile, $logger)
+{
+    $data = file_get_contents($dataFile);
+
+    // Split on semicolons but keep them in the statements
+    $statements = preg_split('/(?<=[;])/', $data, -1, PREG_SPLIT_NO_EMPTY);
+
+    foreach ($statements as $statement) {
+        $statement = trim($statement);
+        if (!empty($statement)) {
+            // Execute non-CREATE statements
+            if (!preg_match('/^\s*CREATE\s+(?:TABLE|INDEX)/i', $statement)) {
+                try {
+                    $db->execute($statement);
+                } catch (Exception $e) {
+                    echo "Error executing data statement: " . $statement . "\n";
+                    $logger->logError("Error executing data statement: " . $statement, $e);
+                    throw $e;
+                }
+            }
+        }
+    }
+}
+
 try {
     // Ensure DB_PATH is set
     if (!getenv('DB_PATH')) {
@@ -75,23 +123,14 @@ try {
     $schemaFile = __DIR__ . '/schema.sql';
     echo "Loading main schema from: $schemaFile\n";
     $logger->logSqlFile($schemaFile, 'Loading main schema');
-    $schema = file_get_contents($schemaFile);
-    $statements = explode(';', $schema);
+    loadSql($db, $schemaFile, $logger);
 
-    foreach ($statements as $statement) {
-        $statement = trim($statement);
-        if (!empty($statement)) {
-            echo "Executing schema statement\n";
-            $db->execute($statement);
-        }
-    }
 
     // Load site data
     $siteFile = __DIR__ . '/www/localhost/site.sql';
     if (file_exists($siteFile)) {
         echo "Loading site data from: $siteFile\n";
-        $siteData = file_get_contents($siteFile);
-        $db->execute($siteData);
+        loadSql($db, $siteFile, $logger);
 
         // Verify site was created
         $sites = $db->query("SELECT * FROM sites");
@@ -119,26 +158,7 @@ try {
         //echo "Creating section schema: " . basename(dirname($schemaFile)) . "\n";
         echo "Creating section schema: " . $schemaFile . "\n";
         $logger->logSqlFile($schemaFile, 'Creating tables from section schema');
-        $schema = file_get_contents($schemaFile);
-
-        // Split on semicolons but keep them in the statements
-        $statements = preg_split('/(?<=[;])/', $schema, -1, PREG_SPLIT_NO_EMPTY);
-
-        foreach ($statements as $statement) {
-            $statement = trim($statement);
-            if (!empty($statement)) {
-                // Execute CREATE TABLE and CREATE INDEX statements
-                if (preg_match('/^\s*CREATE\s+(?:TABLE|INDEX)/i', $statement)) {
-                    try {
-                        $db->execute($statement);
-                    } catch (Exception $e) {
-                        echo "Error executing schema statement: " . $statement . "\n";
-                        $logger->logError("Error executing schema statement: " . $statement, $e);
-                        throw $e;
-                    }
-                }
-            }
-        }
+        loadCreateTableSql($db, $schemaFile, $logger);
     }
 
     // Second pass: Execute all other statements from schemas
@@ -147,25 +167,7 @@ try {
         echo "Loading section data: " . $schemaFile . "\n";
         $logger->logSqlFile($schemaFile, 'Loading section schema data');
         $schema = file_get_contents($schemaFile);
-
-        // Split on semicolons but keep them in the statements
-        $statements = preg_split('/(?<=[;])/', $schema, -1, PREG_SPLIT_NO_EMPTY);
-
-        foreach ($statements as $statement) {
-            $statement = trim($statement);
-            if (!empty($statement)) {
-                // Execute non-CREATE statements
-                if (!preg_match('/^\s*CREATE\s+(?:TABLE|INDEX)/i', $statement)) {
-                    try {
-                        $db->execute($statement);
-                    } catch (Exception $e) {
-                        echo "Error executing data statement: " . $statement . "\n";
-                        $logger->logError("Error executing data statement: " . $statement, $e);
-                        throw $e;
-                    }
-                }
-            }
-        }
+        loadNonCreateSql($db, $schemaFile, $logger);
     }
 
     // Load data from www/{domain}/sections/{section}/data.sql structure

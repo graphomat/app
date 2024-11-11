@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 // Meta data should be passed from index.php in $metaData variable
 $meta = $metaData[0] ?? null;
 

@@ -6,11 +6,11 @@ $teamMembers = $sectionData['team_members'] ?? [];
 <div class="team-section">
     <div class="container">
         <h2 class="section-title">
-            [translate key="team_section_title" lang="<?php echo $currentLang; ?>"]
+            [translate key="section_title" content_type="team" lang="<?php echo $currentLang; ?>"]
         </h2>
 
         <div class="section-description">
-            [translate key="team_section_description" lang="<?php echo $currentLang; ?>"]
+            [translate key="section_description" content_type="team" lang="<?php echo $currentLang; ?>"]
         </div>
 
         <div class="team-grid">

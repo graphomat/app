@@ -5,6 +5,29 @@ INSERT INTO pages (site_id, title, slug, meta_description, meta_keywords, status
     'DBT консультации, психотерапия, индивидуальная терапия, групповая терапия, семейная терапия, запись на консультацию',
     'published');
 
+-- Meta configuration
+INSERT INTO meta (
+    page_id,
+    title,
+    description,
+    keywords,
+    author,
+    og_title,
+    og_description,
+    twitter_card
+) SELECT 
+    3,
+    'Консультации DBT терапии | Запись на прием Unity DBT',
+    'Профессиональные консультации DBT терапии: индивидуальные, групповые и семейные форматы. Очные и онлайн консультации от сертифицированных DBT специалистов.',
+    'консультация DBT терапевта, запись к DBT специалисту, индивидуальная DBT терапия, групповая DBT терапия, онлайн консультация DBT',
+    'DBT Unity Team',
+    'Консультации DBT терапии | Все форматы работы',
+    'Запишитесь на консультацию DBT терапии в удобном формате. Индивидуальные, групповые и онлайн консультации от экспертов DBT.',
+    'summary'
+WHERE NOT EXISTS (
+    SELECT 1 FROM meta WHERE page_id = 3
+);
+
 -- Menu section configuration
 INSERT INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
     (3, 'menu', 'Main Menu', 'Navigation menu', 'menu', 0,

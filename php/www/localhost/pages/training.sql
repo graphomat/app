@@ -5,6 +5,29 @@ INSERT INTO pages (site_id, title, slug, meta_description, meta_keywords, status
     'DBT тренинг, навыки DBT, обучение DBT, групповой тренинг, эмоциональная регуляция',
     'published');
 
+-- Meta configuration
+INSERT INTO meta (
+    page_id,
+    title,
+    description,
+    keywords,
+    author,
+    og_title,
+    og_description,
+    twitter_card
+) SELECT 
+    8,
+    'Тренинг навыков DBT | Групповое обучение DBT терапии',
+    'Комплексная программа обучения навыкам DBT: осознанность, стрессоустойчивость, эмоциональная регуляция и межличностная эффективность. Занятия в малых группах с сертифицированными специалистами.',
+    'DBT тренинг, групповая DBT терапия, обучение DBT навыкам, эмоциональная регуляция, осознанность DBT, стрессоустойчивость',
+    'DBT Unity Team',
+    'Групповой тренинг навыков DBT | Unity DBT',
+    'Научитесь управлять эмоциями и строить качественные отношения с помощью DBT навыков. Групповые занятия с профессиональными тренерами.',
+    'summary'
+WHERE NOT EXISTS (
+    SELECT 1 FROM meta WHERE page_id = 8
+);
+
 -- Menu section configuration
 INSERT INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
     (8, 'menu', 'Main Menu', 'Navigation menu', 'menu', 0,

@@ -5,6 +5,29 @@ INSERT INTO pages (site_id, title, slug, meta_description, meta_keywords, status
      'DBT специалисты, психологи, психотерапевты, DBT терапевты, сертифицированные специалисты, команда Unity DBT',
      'published');
 
+-- Meta configuration
+INSERT INTO meta (
+    page_id,
+    title,
+    description,
+    keywords,
+    author,
+    og_title,
+    og_description,
+    twitter_card
+) SELECT 
+    5,
+    'Профили DBT специалистов | Эксперты Unity DBT',
+    'Подробные профили наших DBT специалистов: образование, опыт работы, сертификации и специализации. Выберите своего DBT терапевта в Unity DBT.',
+    'профили DBT специалистов, DBT терапевты Москва, опытные психологи DBT, сертифицированные DBT специалисты, эксперты DBT терапии',
+    'DBT Unity Team',
+    'Профили специалистов DBT терапии | Unity DBT',
+    'Познакомьтесь с нашими DBT специалистами. Опытные и сертифицированные психотерапевты помогут вам достичь желаемых изменений.',
+    'summary'
+WHERE NOT EXISTS (
+    SELECT 1 FROM meta WHERE page_id = 5
+);
+
 -- Menu section configuration
 INSERT INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
 (5, 'menu', 'Main Menu', 'Navigation menu', 'menu', 0,

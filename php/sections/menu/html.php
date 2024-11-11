@@ -61,6 +61,9 @@ function renderCategoryMenuItem($category) {
     $output .= '</li>';
     return $output;
 }
+
+// Get current language
+$currentLang = $_GET['lang'] ?? 'en';
 ?>
 
 <header class="site-header" data-sticky="<?php echo $data['config']['sticky'] ?? 'true'; ?>">
@@ -93,6 +96,28 @@ function renderCategoryMenuItem($category) {
                 ?>
             </ul>
 
+            <!-- Language Selector -->
+            <div class="language-selector">
+                <button class="lang-toggle" aria-expanded="false">
+                    <span class="current-lang"><?php echo strtoupper($currentLang); ?></span>
+                    <svg class="submenu-icon" viewBox="0 0 20 20" width="16" height="16">
+                        <path d="M5 7l5 5 5-5" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <ul class="lang-submenu">
+                    <li>
+                        <a href="?lang=en" class="lang-option <?php echo $currentLang === 'en' ? 'active' : ''; ?>">
+                            English
+                        </a>
+                    </li>
+                    <li>
+                        <a href="?lang=pl" class="lang-option <?php echo $currentLang === 'pl' ? 'active' : ''; ?>">
+                            Polski
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
             <?php if ($data['config']['show_search'] ?? false): ?>
                 <!-- Search -->
                 <div class="search-container">
@@ -109,7 +134,7 @@ function renderCategoryMenuItem($category) {
                     <form class="search-form" action="/search" method="get">
                         <input type="search" 
                                name="q" 
-                               placeholder="Поиск..." 
+                               placeholder="<?php echo $currentLang === 'pl' ? 'Szukaj...' : 'Search...'; ?>" 
                                aria-label="Search"
                                required>
                         <button type="submit" aria-label="Submit search">
@@ -142,7 +167,7 @@ function renderCategoryMenuItem($category) {
             <form class="search-form" action="/search" method="get">
                 <input type="search" 
                        name="q" 
-                       placeholder="Поиск..." 
+                       placeholder="<?php echo $currentLang === 'pl' ? 'Szukaj...' : 'Search...'; ?>" 
                        aria-label="Search"
                        required>
                 <button type="submit" aria-label="Submit search">

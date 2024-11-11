@@ -1,177 +1,189 @@
-# Integrations System
+# Integrations
 
-This system provides powerful integration capabilities through shortcodes, webhooks, and API endpoints that can be used within sections.
+This directory contains systems for extending functionality through third-party services, APIs, and custom processors.
 
-## Shortcodes
+## Integration Types
 
-Shortcodes allow you to embed dynamic content in your sections. They are processed at runtime and converted to HTML.
+### API Integration
+Location: `/integrations/api`
+- External API connections
+- Authentication handling
+- Rate limiting
+- Response caching
+- Error handling
 
-### YouTube Example
-```php
-// In your section content:
-[youtube id="VIDEO_ID" width="560" height="315" autoplay="0" controls="1"]
+### Shortcodes
+Location: `/integrations/shortcodes`
+- Content processing system
+- Dynamic content insertion
+- Translation support
+- Media embedding
+- Custom shortcode handlers
 
-// Register new shortcode:
-class MyShortcode {
-    public static function register() {
-        ShortcodeProcessor::register('my-shortcode', [self::class, 'render']);
-    }
+### Webhooks
+Location: `/integrations/webhooks`
+- Event-driven integration
+- Payload validation
+- Security measures
+- Logging system
+- Error handling
 
-    public static function render($attrs) {
-        // Process attributes and return HTML
-        return '<div>...</div>';
-    }
-}
+## Directory Structure
+```
+integrations/
+├── api/
+│   ├── core/           # Core API functionality
+│   ├── examples/       # Usage examples
+│   └── README.md       # API documentation
+├── shortcodes/
+│   ├── core/           # Core shortcode processors
+│   ├── examples/       # Example implementations
+│   └── README.md       # Shortcode documentation
+└── webhooks/
+    ├── core/           # Core webhook handlers
+    ├── examples/       # Example implementations
+    └── README.md       # Webhook documentation
 ```
 
-### Translation Example
+## Usage Examples
+
+### API Integration
 ```php
-// In your section content:
-[translate key="welcome_message" lang="es"]
-
-// Will be replaced with translation from database
-```
-
-## Webhooks
-
-Webhooks allow external services to receive notifications about content changes.
-
-### Content Update Example
-```php
-// In your section's query.php:
-WebhookProcessor::trigger('content.updated', [
-    'content_id' => $contentId,
-    'content_type' => 'section',
-    'section' => $sectionName,
-    'user_id' => $currentUserId,
-    'changes' => [
-        'title' => [
-            'old' => $oldTitle,
-            'new' => $newTitle
-        ]
-    ]
+// Initialize API integration
+$api = new ApiIntegration([
+    'endpoint' => 'https://api.service.com',
+    'key' => 'your_api_key',
+    'timeout' => 30
 ]);
 
-// Configure webhook URL in admin panel:
-// Settings -> Integrations -> Webhooks
-// Add URL: https://api.example.com/webhooks/content-updates
+// Make API request
+$response = $api->request('GET', '/endpoint');
 ```
 
-## API Endpoints
-
-The API system allows sections to expose and consume data through REST endpoints.
-
-### Translation API Example
+### Shortcodes
 ```php
-// Get translations:
-GET /api/translations?lang=es&type=section&content_id=123
+// Register shortcode
+ShortcodeManager::register('youtube', function($attrs) {
+    return '<iframe src="https://youtube.com/embed/' . $attrs['id'] . '"></iframe>';
+});
 
-// Create translation:
-POST /api/translations
-{
-    "language_code": "es",
-    "content_type": "section", 
-    "content_id": 123,
-    "field_name": "title",
-    "translation": "¡Bienvenidos!"
-}
-
-// Update translation:
-PUT /api/translations/456
-{
-    "translation": "¡Hola Mundo!"
-}
-
-// Headers required:
-X-API-Key: your_api_key_here
-Content-Type: application/json
-```
-
-## Using in Sections
-
-### Example: Multilingual Video Section
-
-```php
-// In section's html.php:
-<div class="video-section">
-    <h2>[translate key="video_title" lang="<?php echo $currentLang; ?>"]</h2>
-    <div class="video">
-        [youtube id="<?php echo $videoId; ?>" width="800" height="450"]
-    </div>
-    <p>[translate key="video_description" lang="<?php echo $currentLang; ?>"]</p>
-</div>
-
-// In section's query.php:
-$videoId = $_POST['video_id'] ?? null;
-if ($videoId) {
-    // Update video ID in database
-    // Then trigger webhook
-    WebhookProcessor::trigger('content.updated', [
-        'content_id' => $sectionId,
-        'content_type' => 'section',
-        'section' => 'video',
-        'user_id' => $currentUserId,
-        'changes' => [
-            'video_id' => [
-                'old' => $oldVideoId,
-                'new' => $videoId
-            ]
-        ]
-    ]);
-}
-```
-
-## Database Schema
-
-The integrations system uses the following tables:
-
-### Languages & Translations
-```sql
-CREATE TABLE languages (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    code VARCHAR(5) NOT NULL UNIQUE,
-    name VARCHAR(50) NOT NULL,
-    is_default BOOLEAN DEFAULT FALSE,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE translations (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    language_id INT NOT NULL,
-    content_type VARCHAR(50) NOT NULL,
-    content_id INT NOT NULL,
-    field_name VARCHAR(50) NOT NULL,
-    translation TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (language_id) REFERENCES languages(id),
-    UNIQUE KEY unique_translation (language_id, content_type, content_id, field_name)
-);
+// Process content
+$content = ShortcodeManager::process('[youtube id="video_id"]');
 ```
 
 ### Webhooks
-```sql
-CREATE TABLE webhooks (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    url VARCHAR(255) NOT NULL,
-    events JSON NOT NULL,
-    secret_key VARCHAR(255),
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_triggered TIMESTAMP NULL
-);
+```php
+// Register webhook handler
+WebhookManager::register('payment_complete', function($payload) {
+    // Handle payment completion
+    OrderProcessor::complete($payload['order_id']);
+});
 ```
 
-### API Keys
-```sql
-CREATE TABLE api_keys (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    api_key VARCHAR(255) NOT NULL UNIQUE,
-    permissions JSON NOT NULL,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_used TIMESTAMP NULL
-);
+## Creating New Integrations
+
+1. Choose integration type (API/Shortcode/Webhook)
+2. Create necessary files following structure
+3. Implement core functionality
+4. Add documentation
+5. Create usage examples
+6. Add tests
+
+## Security
+
+### API Security
+- API key management
+- Request signing
+- Rate limiting
+- IP whitelisting
+- SSL/TLS enforcement
+
+### Shortcode Security
+- Input sanitization
+- Output escaping
+- Permission checking
+- Resource limitations
+
+### Webhook Security
+- Payload validation
+- Signature verification
+- IP validation
+- Rate limiting
+- Error handling
+
+## Testing
+
+Test integrations using:
+```bash
+./test.sh integrations/type_name
+```
+
+## Configuration
+
+### API Configuration
+```php
+// config/integrations/api.php
+return [
+    'timeout' => 30,
+    'retry_attempts' => 3,
+    'cache_duration' => 3600
+];
+```
+
+### Shortcode Configuration
+```php
+// config/integrations/shortcodes.php
+return [
+    'allowed_tags' => ['youtube', 'vimeo', 'translate'],
+    'cache_enabled' => true
+];
+```
+
+### Webhook Configuration
+```php
+// config/integrations/webhooks.php
+return [
+    'secret_key' => 'your_secret_key',
+    'allowed_ips' => ['192.168.1.1']
+];
+```
+
+## Best Practices
+
+1. Error Handling
+   - Log all errors
+   - Provide meaningful messages
+   - Implement fallbacks
+
+2. Performance
+   - Cache responses
+   - Implement rate limiting
+   - Use async processing
+
+3. Security
+   - Validate all inputs
+   - Sanitize outputs
+   - Use secure connections
+
+4. Maintenance
+   - Document all integrations
+   - Monitor usage
+   - Regular updates
+
+## Troubleshooting
+
+Common issues and solutions:
+1. API Connection Issues
+   - Check credentials
+   - Verify endpoints
+   - Check network
+
+2. Shortcode Problems
+   - Verify syntax
+   - Check permissions
+   - Review logs
+
+3. Webhook Failures
+   - Verify payload
+   - Check signatures
+   - Monitor logs

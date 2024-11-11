@@ -9,6 +9,7 @@ class PageLoader {
     private $db;
     private $loadedStyles = [];
     private $loadedScripts = [];
+    private $translations = [];
 
     public function __construct() {
         $this->logger = Logger::getInstance();
@@ -19,6 +20,44 @@ class PageLoader {
             throw new Exception('DB_PATH environment variable is not set');
         }
         $this->db = Database::getInstance();
+        
+        // Load translations
+        $this->loadTranslations();
+    }
+
+    private function loadTranslations() {
+        try {
+            $query = "SELECT l.code as lang, t.content_type || '.' || t.field_name as key, t.translation as value 
+                     FROM translations t 
+                     JOIN languages l ON t.language_id = l.id";
+            $result = $this->db->query($query);
+            foreach ($result as $row) {
+                $this->translations[$row['lang']][$row['key']] = $row['value'];
+            }
+            $this->logger->log("Translations loaded successfully");
+        } catch (Exception $e) {
+            $this->logger->logError("Error loading translations", $e);
+        }
+    }
+
+    private function processTranslations($content) {
+        return preg_replace_callback(
+            '/\[translate key="([^"]+)" lang="([^"]+)"\]/',
+            function($matches) {
+                $key = $matches[1];
+                $lang = $matches[2];
+                return $this->getTranslation($key, $lang);
+            },
+            $content
+        );
+    }
+
+    private function getTranslation($key, $lang) {
+        if (isset($this->translations[$lang][$key])) {
+            return $this->translations[$lang][$key];
+        }
+        $this->logger->log("Translation not found: {$key} ({$lang})", "WARNING");
+        return $key; // Return the key as fallback
     }
 
     public function loadSection($sectionName) {
@@ -32,17 +71,57 @@ class PageLoader {
 
         // Load section files
         $this->loadSectionStyle($sectionName);
+        
+        // Capture section HTML output to process translations
+        ob_start();
         $this->loadSectionHTML($sectionName);
+        $content = ob_get_clean();
+        echo $this->processTranslations($content);
+        
         $this->registerSectionScript($sectionName);
+        
+        // Load all other files except SQL
+        $files = glob($sectionPath . '/*');
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                $extension = pathinfo($file, PATHINFO_EXTENSION);
+                if ($extension !== 'sql' && 
+                    $extension !== 'css' && // Skip CSS as it's already handled
+                    $extension !== 'js' &&  // Skip JS as it's already handled
+                    $extension !== 'php') { // Skip PHP as it's already handled
+                    include $file;
+                }
+            }
+        }
         
         return true;
     }
 
     private function loadSectionStyle($sectionName) {
-        $stylePath = "/sections/{$sectionName}/style.css";
-        if (!in_array($stylePath, $this->loadedStyles) && file_exists(__DIR__ . $stylePath)) {
-            $this->loadedStyles[] = $stylePath;
-            echo "<link rel='stylesheet' href='{$stylePath}?v=" . filemtime(__DIR__ . $stylePath) . "'>\n";
+        // Load base style from sections directory
+        $baseStylePath = "/sections/{$sectionName}/style.css";
+        $fullpath = __DIR__ . $baseStylePath;
+        if (!in_array($baseStylePath, $this->loadedStyles) && file_exists($fullpath)) {
+            $this->loadedStyles[] = $baseStylePath;
+            echo "<link rel='stylesheet' href='{$baseStylePath}?v=" . filemtime($fullpath) . "'>\n";
+            $this->logger->log("Loaded base style: {$baseStylePath} path: {$fullpath}");
+        }
+
+        // Check for override style in www directory
+        $wwwPath = __DIR__ . '/../www';
+        if (is_dir($wwwPath)) {
+            $sites = glob($wwwPath . '/*', GLOB_ONLYDIR);
+            foreach ($sites as $site) {
+                $overrideStylePath = $site . "/sections/{$sectionName}/style.css";
+                if (file_exists($overrideStylePath)) {
+                    $relativePath = str_replace(__DIR__, '', $overrideStylePath);
+                    if (!in_array($relativePath, $this->loadedStyles)) {
+                        $this->loadedStyles[] = $relativePath;
+                        echo "<link rel='stylesheet' href='{$relativePath}?v=" . filemtime($overrideStylePath) . "'>\n";
+                        $this->logger->log("Loaded override style: {$relativePath} path: {$overrideStylePath}");
+                    }
+                }
+            }
         }
     }
 
@@ -50,6 +129,7 @@ class PageLoader {
         $htmlPath = __DIR__ . "/sections/{$sectionName}/html.php";
         if (file_exists($htmlPath)) {
             include $htmlPath;
+            $this->logger->log("Loaded HTML: {$htmlPath}");
         }
     }
 
@@ -58,11 +138,17 @@ class PageLoader {
         if (!in_array($scriptPath, $this->loadedScripts) && file_exists(__DIR__ . $scriptPath)) {
             $this->loadedScripts[] = $scriptPath;
             echo "<script defer src='{$scriptPath}?v=" . filemtime(__DIR__ . $scriptPath) . "'></script>\n";
+            $this->logger->log("Registered script: {$scriptPath}");
         }
     }
 
     public function run() {
         try {
+            // Start session before any output
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
+            }
+
             // Get current page from URL
             $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
             $page = trim($uri, '/');
@@ -121,8 +207,9 @@ class PageLoader {
             // Include footer
             include __DIR__ . '/footer.php';
             
-            // Send output
-            ob_end_flush();
+            // Process translations in the final output
+            $content = ob_get_clean();
+            echo $this->processTranslations($content);
             
             $this->logger->log("Page rendered successfully");
             

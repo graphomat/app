@@ -1,100 +1,200 @@
-# User and API Token Management
+# Utility Scripts
 
-This directory contains scripts for managing users and API tokens for the DBT Unity application.
+This directory contains utility scripts for various system operations, maintenance, and automation tasks.
 
-## Create User Script
+## Available Scripts
 
-The `create_user.php` script provides functionality to:
-1. Create new user accounts
-2. Generate API tokens for existing users
-3. Automatically handle database schema updates
+### User Management
+- `create_user.php` - Create admin users
+- `create_team_page.php` - Generate team pages
 
-## Usage
+## Script Details
 
-### Create a New User
-
-To create a new user with an API token:
-
+### create_user.php
+Creates admin users with proper authentication:
 ```bash
-php create_user.php --action=create --username=user1 --password=pass1
+php scripts/create_user.php
 ```
 
-Example:
+Options:
+- `--username` - Admin username
+- `--password` - User password
+- `--email` - User email
+- `--role` - User role (default: admin)
+
+### create_team_page.php
+Generates team member pages:
 ```bash
-php create_user.php --action=create --username=api_user --password=secure_password123
+php scripts/create_team_page.php
 ```
 
-This will:
-- Create a new user account
-- Generate an API token
-- Set token expiration (30 days by default)
-- Display the token and expiration date
+Features:
+- Creates team member profiles
+- Generates necessary SQL
+- Sets up page routing
+- Configures sections
 
-### Generate New Token
+## Usage Guidelines
 
-To generate a new API token for an existing user:
-
+### 1. User Creation
 ```bash
-php create_user.php --action=token --username=your_username
+# Create admin user
+php scripts/create_user.php --username=admin --password=secure123 --email=admin@example.com
+
+# Create editor user
+php scripts/create_user.php --username=editor --password=secure123 --role=editor
 ```
 
-Example:
+### 2. Team Page Creation
 ```bash
-php create_user.php --action=token --username=api_user
+# Generate team page
+php scripts/create_team_page.php --template=default
+
+# Generate with custom layout
+php scripts/create_team_page.php --template=custom --layout=grid
 ```
 
-This will:
-- Generate a new API token
-- Update token expiration
-- Display the new token and expiration date
+## Best Practices
 
-## API Token Usage
+1. Security
+   - Use strong passwords
+   - Validate inputs
+   - Handle errors
+   - Log operations
 
-Once you have an API token, use it in your API requests:
+2. Performance
+   - Optimize operations
+   - Handle large datasets
+   - Use transactions
+   - Clean up resources
 
-```bash
-curl -H "Authorization: Bearer your_api_token" http://your-api-endpoint
+3. Maintenance
+   - Document changes
+   - Version control
+   - Regular updates
+   - Error logging
+
+## Creating New Scripts
+
+1. Script Structure
+```php
+#!/usr/bin/env php
+<?php
+
+// Include required files
+require_once __DIR__ . '/../config/env.php';
+require_once __DIR__ . '/../config/Database.php';
+
+// Parse arguments
+$options = getopt('', ['param:']);
+
+// Validate inputs
+if (!isset($options['param'])) {
+    die("Missing required parameter\n");
+}
+
+// Perform operations
+try {
+    // Script logic here
+} catch (Exception $e) {
+    die("Error: " . $e->getMessage() . "\n");
+}
 ```
 
-Example:
-```bash
-curl -H "Authorization: Bearer abc123..." http://localhost/graphomat/app/php/api/content
+2. Add Documentation
+- Script purpose
+- Required parameters
+- Usage examples
+- Error handling
+
+3. Add Testing
+- Create test cases
+- Verify functionality
+- Test edge cases
+- Document tests
+
+## Error Handling
+
+Scripts should handle common errors:
+```php
+try {
+    // Operation
+} catch (DatabaseException $e) {
+    die("Database error: " . $e->getMessage() . "\n");
+} catch (ValidationException $e) {
+    die("Validation error: " . $e->getMessage() . "\n");
+} catch (Exception $e) {
+    die("Unexpected error: " . $e->getMessage() . "\n");
+}
 ```
 
-## Security Notes
+## Logging
 
-1. Store API tokens securely
-2. Never share tokens in public repositories
-3. Regenerate tokens if compromised
-4. Tokens expire after 30 days by default
+Implement proper logging:
+```php
+function log_operation($message, $level = 'INFO') {
+    $timestamp = date('Y-m-d H:i:s');
+    file_put_contents(
+        __DIR__ . '/../logs/scripts.log',
+        "[$timestamp] [$level] $message\n",
+        FILE_APPEND
+    );
+}
+```
 
-## Database Schema
+## Testing
 
-The script manages the following user table schema:
+Test scripts using:
+```bash
+./test.sh scripts/script_name.php
+```
 
-```sql
-CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL,
-    api_token TEXT,
-    token_expiry DATETIME,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+## Automation
+
+Scripts can be automated using cron:
+```bash
+# Daily user cleanup
+0 0 * * * /usr/bin/php /path/to/scripts/cleanup_users.php
+
+# Hourly backup
+0 * * * * /usr/bin/php /path/to/scripts/backup.php
 ```
 
 ## Troubleshooting
 
-1. If you get "Permission denied":
-   ```bash
-   chmod +x create_user.php
-   ```
+Common issues and solutions:
 
-2. If database connection fails:
-   - Check database file permissions
-   - Verify database path in config
+1. Permission Issues
+   - Check file permissions
+   - Verify user rights
+   - Review directory access
 
-3. If token generation fails:
-   - Ensure user exists
-   - Check database write permissions
-   - Verify PHP has sufficient entropy for random_bytes()
+2. Database Problems
+   - Check connection
+   - Verify credentials
+   - Review queries
+
+3. Input Errors
+   - Validate parameters
+   - Check data format
+   - Handle missing inputs
+
+## Development Guidelines
+
+1. Code Style
+   - Follow PSR standards
+   - Use meaningful names
+   - Add comments
+   - Document changes
+
+2. Security
+   - Sanitize inputs
+   - Validate data
+   - Use prepared statements
+   - Handle sensitive data
+
+3. Performance
+   - Optimize operations
+   - Use transactions
+   - Handle resources
+   - Clean up properly

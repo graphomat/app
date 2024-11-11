@@ -5,6 +5,29 @@ INSERT INTO pages (site_id, title, slug, meta_description, meta_keywords, status
     'DBT, диалектическая поведенческая терапия, DBT терапия, эмоциональная регуляция, осознанность, навыки DBT',
     'published');
 
+-- Meta configuration
+INSERT INTO meta (
+    page_id,
+    title,
+    description,
+    keywords,
+    author,
+    og_title,
+    og_description,
+    twitter_card
+) SELECT 
+    6,
+    'Диалектическая поведенческая терапия (DBT) - Принципы и компоненты | DBT Unity',
+    'Подробное руководство по DBT терапии: основные принципы, компоненты, навыки и научная эффективность. Узнайте, как DBT помогает в управлении эмоциями и улучшении качества жизни.',
+    'DBT терапия, диалектическая поведенческая терапия, эмоциональная регуляция, навыки DBT, осознанность, стрессоустойчивость, межличностная эффективность',
+    'DBT Unity Team',
+    'Диалектическая поведенческая терапия (DBT) - Полное руководство',
+    'Изучите основы DBT терапии: принципы, компоненты, навыки и научные доказательства эффективности метода в работе с эмоциональной нестабильностью.',
+    'summary'
+WHERE NOT EXISTS (
+    SELECT 1 FROM meta WHERE page_id = 6
+);
+
 -- Menu section configuration
 INSERT INTO sections (page_id, name, title, description, type, sort_order, data) VALUES
     (6, 'menu', 'Main Menu', 'Navigation menu', 'menu', 0,

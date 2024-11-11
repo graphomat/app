@@ -17,6 +17,37 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Language selector toggle
+    const langToggle = document.querySelector('.lang-toggle');
+    const langSubmenu = document.querySelector('.lang-submenu');
+
+    if (langToggle && langSubmenu) {
+        langToggle.addEventListener('click', function(e) {
+            // Only handle click for mobile view
+            if (window.innerWidth <= 768) {
+                e.preventDefault();
+                const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                this.setAttribute('aria-expanded', !isExpanded);
+                
+                // Close other menus
+                submenuToggles.forEach(toggle => {
+                    toggle.setAttribute('aria-expanded', 'false');
+                });
+            }
+        });
+
+        // Handle language selection
+        const langOptions = document.querySelectorAll('.lang-option');
+        langOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                const currentLang = this.getAttribute('href').split('=')[1];
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('lang', currentLang);
+                window.location.href = currentUrl.toString();
+            });
+        });
+    }
+
     // Submenu toggles for mobile
     const submenuToggles = document.querySelectorAll('.has-submenu > button');
     
@@ -43,12 +74,16 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
         if (window.innerWidth <= 768) {
             const isClickInside = siteNav?.contains(e.target) || menuToggle?.contains(e.target);
+            const isLangClick = langToggle?.contains(e.target) || langSubmenu?.contains(e.target);
             
-            if (!isClickInside && menuToggle?.getAttribute('aria-expanded') === 'true') {
+            if (!isClickInside && !isLangClick && menuToggle?.getAttribute('aria-expanded') === 'true') {
                 menuToggle.setAttribute('aria-expanded', 'false');
                 submenuToggles.forEach(toggle => {
                     toggle.setAttribute('aria-expanded', 'false');
                 });
+                if (langToggle) {
+                    langToggle.setAttribute('aria-expanded', 'false');
+                }
             }
         }
     });
@@ -64,6 +99,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 submenuToggles.forEach(toggle => {
                     toggle.setAttribute('aria-expanded', 'false');
                 });
+                if (langToggle) {
+                    langToggle.setAttribute('aria-expanded', 'false');
+                }
             }
         }, 250);
     });
